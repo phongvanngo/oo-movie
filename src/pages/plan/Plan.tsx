@@ -4,15 +4,16 @@ import PageHeader from '../../components/page-header/PageHeader';
 
 interface Props {}
 
+const SCROLL_TOP_LOCATION = 80;
+
 export default function Plan({}: Props): ReactElement {
   useEffect(() => {
-    window.scrollTo({ top: 80, behavior: 'smooth' });
+    window.scrollTo({ top: SCROLL_TOP_LOCATION, behavior: 'smooth' });
   }, []);
 
   return (
     <>
       <PageHeader></PageHeader>
-
       <div className="py-6">
         <div className="flex flex-col justify-center items-center ">
           <div className="text-3xl mb-10">
