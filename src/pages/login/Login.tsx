@@ -3,9 +3,15 @@ import PageHeader from '../../components/page-header/PageHeader';
 import { FcGoogle } from 'react-icons/fc';
 import { BsFacebook } from 'react-icons/bs';
 import './login.scss';
+import { firebase } from '../../firebase/firebase';
+
 interface Props {}
 
 export default function LoginPage({}: Props): ReactElement {
+  const SignInWithGoogle = () => {
+    // const google__provider = new Firebase.
+  };
+
   const mainref = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
