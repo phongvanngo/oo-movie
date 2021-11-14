@@ -11,7 +11,7 @@ import Plan from 'pages/plan/Plan';
 const Routes = () => {
   return (
     <Switch>
-      <Route path="/signin" component={LoginPage} />
+      <Route path="/sign-in" component={LoginPage} />
       <Route path="/plan" component={Plan} />
       <Route path="/:category/search/:keyword" component={Catalog} />
       <Route path="/:category/:id" component={Detail} />
