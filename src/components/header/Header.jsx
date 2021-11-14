@@ -20,6 +20,10 @@ const headerNav = [
     path: '/tv',
   },
   {
+    display: 'Plan',
+    path: '/plan',
+  },
+  {
     display: 'Sign In',
     path: '/sign-in',
   },
