@@ -7,6 +7,7 @@ import Catalog from '../pages/Catalog';
 import Detail from '../pages/detail/Detail';
 import LoginPage from 'pages/login/Login';
 import Plan from 'pages/plan/Plan';
+import Theater from 'pages/theater';
 
 const Routes = () => {
   return (
@@ -14,6 +15,7 @@ const Routes = () => {
       <Route path="/sign-in" component={LoginPage} />
       <Route path="/plan" component={Plan} />
       <Route path="/:category/search/:keyword" component={Catalog} />
+      <Route path="/:category/:id/watching" component={Theater} />
       <Route path="/:category/:id" component={Detail} />
       <Route path="/:category" component={Catalog} />
       <Route path="/" exact component={Home} />

@@ -37,7 +37,7 @@ const VideoPlayer: React.FC<IVideoPlayerProps> = ({ options }) => {
     };
   }, [options]);
 
-  return <video ref={videoNode} className="video-js" />;
+  return <video ref={videoNode} className="video-js vjs-big-play-centered" />;
 };
 
 export default VideoPlayer;

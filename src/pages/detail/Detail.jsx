@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useHistory, useLocation, useParams } from 'react-router';
 
 import tmdbApi from '../../api/tmdbApi';
 import apiConfig from '../../api/apiConfig';
@@ -10,20 +10,16 @@ import VideoList from './VideoList';
 
 import MovieList from '../../components/movie-list/MovieList';
 import VideoPlayer from 'components/videoplayer';
+import Button, { OutlineButton } from 'components/button/Button';
 
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
 
-  const videoJsOptions = {
-    sources: [
-      {
-        src: '//vjs.zencdn.net/v/oceans.mp4',
-        type: 'video/mp4',
-      },
-    ],
-  };
+  let hisrory = useHistory();
+
+  const location = useLocation();
 
   useEffect(() => {
     const getDetail = async () => {
@@ -74,7 +70,14 @@ const Detail = () => {
                 </div>
                 <CastList id={item.id} />
               </div>
-              {/* button watch movie here */}
+              <div className="btns">
+                <Button
+                  onClick={() => hisrory.push(location.pathname + '/watching')}
+                >
+                  Watch now
+                </Button>
+                <OutlineButton>Watch Trailer</OutlineButton>
+              </div>
             </div>
           </div>
           <div className="container">
@@ -87,7 +90,6 @@ const Detail = () => {
               </div>
               <MovieList category={category} type="similar" id={item.id} />
             </div>
-            <VideoPlayer options={videoJsOptions} />
           </div>
         </>
       )}
