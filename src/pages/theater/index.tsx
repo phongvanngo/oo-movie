@@ -1,11 +1,12 @@
 import tmdbApi from 'api/tmdbApi';
-import PageHeader from 'components/page-header/PageHeader';
 import VideoPlayer from 'components/videoplayer';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { MovieDetail } from 'interfaces/MovideDetail';
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { FixMeLater } from 'interfaces/Migrate';
 import apiConfig from 'api/apiConfig';
+import MovieList from 'components/movie-list/MovieList';
+import './theater.scss';
 
 interface Props {}
 
@@ -17,7 +18,8 @@ type RouterParams = {
 const videoJsOptions = {
   sources: [
     {
-      src: '//vjs.zencdn.net/v/oceans.mp4',
+      // src: '//vjs.zencdn.net/v/oceans.mp4',
+      src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
       type: 'video/mp4',
     },
   ],
@@ -34,8 +36,10 @@ export default function Theater({}: Props): ReactElement {
 
   useEffect(() => {
     const getDetail = async () => {
-      const response = await tmdbApi.detail(category, id, { params: {} });
-      // setItem(response);
+      const response: FixMeLater = await tmdbApi.detail(category, id, {
+        params: {},
+      });
+      setItem(response);
       // console.log(response.data);
       window.scrollTo(0, 0);
     };
@@ -54,22 +58,18 @@ export default function Theater({}: Props): ReactElement {
               )})`,
             }}
           ></div>
-          <div className="mb-3 movie-content container">
-            <div className="movie-content__poster">
-              <div> Hello</div>
-            </div>
+
+          <div className="section movie ">
+            <VideoPlayer options={videoJsOptions} />
+            <div>Tap phim</div>
+            <div>Comment</div>
+          </div>
+          <div className="section">
+            <div>You may also like</div>
+            <MovieList category={category} type="similar" id={item.id} />
           </div>
         </>
       )}
-      {/*       
-      <div className="flex px-6">
-        <div className="w-2/3">
-          <VideoPlayer options={videoJsOptions} />
-        </div>
-        <div className="w-1/3 pl-12 flex flex-col items-center ">
-          <div className="">You also like</div>
-        </div>
-      </div> */}
     </div>
   );
 }

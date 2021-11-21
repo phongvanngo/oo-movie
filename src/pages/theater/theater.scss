@@ -27,3 +27,11 @@
     background-image: linear-gradient(to top, $body-bg, rgba($black, 0));
   }
 }
+
+.movie {
+  max-width: 1260px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -200px;
+  position: relative;
+}
