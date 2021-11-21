@@ -7,6 +7,8 @@ import { FixMeLater } from 'interfaces/Migrate';
 import apiConfig from 'api/apiConfig';
 import MovieList from 'components/movie-list/MovieList';
 import './theater.scss';
+import MovieChappers from 'components/movie-chappers/MovieChappers';
+import Comments from 'components/comments';
 
 interface Props {}
 
@@ -59,14 +61,26 @@ export default function Theater({}: Props): ReactElement {
             }}
           ></div>
 
-          <div className="section movie ">
-            <VideoPlayer options={videoJsOptions} />
-            <div>Tap phim</div>
-            <div>Comment</div>
-          </div>
           <div className="section">
-            <div>You may also like</div>
-            <MovieList category={category} type="similar" id={item.id} />
+            <div className=" movie mb-8">
+              <VideoPlayer options={videoJsOptions} />
+            </div>
+            <div className="flex">
+              <div className="w-3/4">
+                <div>
+                  <div className="mb-4 text-lg">Chapter:</div>
+                  <MovieChappers />
+                </div>
+                <div>
+                  <Comments />
+                </div>
+              </div>
+              <div className="w-1/4">Banner QC</div>
+            </div>
+            <div className="mb-10">
+              <div className="mb-4">You may also like</div>
+              <MovieList category={category} type="similar" id={item.id} />
+            </div>
           </div>
         </>
       )}
