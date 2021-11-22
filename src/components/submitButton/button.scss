@@ -1,0 +1,24 @@
+@use '../../scss/variables' as *;
+
+.button__submit {
+  margin: 10px 0px;
+  border: 1px solid $white;
+  padding: 6px 14px;
+  border-radius: 10%;
+  transition: 0.3s linear;
+}
+
+.button__submit:hover {
+  transform: scale(1.07);
+  background-color: $white;
+}
+
+.button__submit-primary:hover {
+  color: $main-color;
+  //   background-color: $main-color;
+}
+
+.button__submit-secondary:hover {
+  color: $black;
+  //   background-color: $main-color;
+}

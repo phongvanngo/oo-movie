@@ -60,6 +60,15 @@
   background: $body-bg;
 }
 
-.chappter:hover {
+.chappter-active {
+  color: $main-color;
+}
+.chappter-active::before {
+  width: 0px;
+  background: $body-bg;
+}
+
+.chappter-active::after {
+  height: 0px;
   background: $body-bg;
 }

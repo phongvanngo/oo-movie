@@ -9,6 +9,7 @@ import MovieList from 'components/movie-list/MovieList';
 import './theater.scss';
 import MovieChappers from 'components/movie-chappers/MovieChappers';
 import Comments from 'components/comments';
+import { Helmet } from 'react-helmet';
 
 interface Props {}
 
@@ -37,6 +38,8 @@ export default function Theater({}: Props): ReactElement {
   // const location = useLocation();
 
   useEffect(() => {
+    document.title = 'Theater';
+
     const getDetail = async () => {
       const response: FixMeLater = await tmdbApi.detail(category, id, {
         params: {},
@@ -67,11 +70,12 @@ export default function Theater({}: Props): ReactElement {
             </div>
             <div className="flex">
               <div className="w-3/4">
-                <div>
-                  <div className="mb-4 text-lg">Chapter:</div>
+                <div className="mb-10">
+                  <div className="mb-4 text-lg">Chapters</div>
                   <MovieChappers />
                 </div>
                 <div>
+                  <div className="mb-4 text-lg">Comments</div>
                   <Comments />
                 </div>
               </div>
