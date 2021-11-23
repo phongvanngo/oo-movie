@@ -68,18 +68,18 @@ export default function Theater({}: Props): ReactElement {
             <div className=" movie mb-8">
               <VideoPlayer options={videoJsOptions} />
             </div>
-            <div className="flex">
+            <div className="flex mb-10">
               <div className="w-3/4">
                 <div className="mb-10">
                   <div className="mb-4 text-lg">Chapters</div>
                   <MovieChappers />
                 </div>
-                <div>
+                <div className="pr-6">
                   <div className="mb-4 text-lg">Comments</div>
                   <Comments />
                 </div>
               </div>
-              <div className="w-1/4">Banner QC</div>
+              <div className="w-1/4 bg-gray-700 pr-6 text-black">Banner QC</div>
             </div>
             <div className="mb-10">
               <div className="mb-4">You may also like</div>

@@ -1,12 +1,11 @@
 import React, { ReactElement } from 'react';
 import Comment from './CommentCard';
 import InputComment from './InputComment';
+import { IComment } from 'interfaces/MovideDetail';
 
 interface Props {}
 
 const commentData = {
-  title: 'Fake article title.',
-  author: 'grzm',
   comments: [
     {
       id: 1,
@@ -29,16 +28,13 @@ const commentData = {
   ],
 };
 
-export default function Comments({}: Props): ReactElement {
+export default function Comments({ comments }: IComment): ReactElement {
   return (
     <div>
+      <InputComment />
       <div>
-        <InputComment />
-      </div>
-      <div>
-        {/* <Comment comments={commentData} /> */}
         {commentData.comments.map((comment) => {
-          return <Comment key={comment.id} comments={comment} />;
+          return <Comment key={comment.id} comment={comment} />;
         })}
       </div>
     </div>

@@ -48,3 +48,23 @@ export interface MovieDetail {
   vote_average: number;
   vote_count: number;
 }
+
+// ======== Comment interfaces==========
+export interface Child {
+  id: number;
+  text: string;
+  author: string;
+}
+
+export interface Comment {
+  id: number;
+  text: string;
+  author: string;
+  children?: Child[];
+}
+
+export interface IComment {
+  title?: string;
+  author?: string;
+  comments?: Comment[];
+}

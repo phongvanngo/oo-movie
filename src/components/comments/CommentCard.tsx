@@ -5,25 +5,6 @@ import { FixMeLater } from 'interfaces/Migrate';
 
 interface Props {}
 
-interface Child {
-  id: number;
-  text: string;
-  author: string;
-}
-
-interface Comment {
-  id: number;
-  text: string;
-  author: string;
-  children?: Child[];
-}
-
-interface RootObject {
-  title: string;
-  author: string;
-  comments?: Comment[];
-}
-
 export default function Comment({ comment }: FixMeLater): ReactElement {
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
