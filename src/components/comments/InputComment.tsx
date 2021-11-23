@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 interface Props {}
 
 export default function InputComment({}: Props): ReactElement {
-  const ROW = 6;
+  const ROW = 4;
 
   return (
     <div className="text-sm ">
@@ -14,7 +14,7 @@ export default function InputComment({}: Props): ReactElement {
           name=""
           id=""
           rows={ROW}
-          className="w-full bg-transparent border-white border p-2 rounded-md outline-none"
+          className="w-full bg-transparent border-white border p-3 rounded-md outline-none"
         ></textarea>
       </div>
       <div className="flex justify-end items-center">
