@@ -2,7 +2,7 @@ import tmdbApi from 'api/tmdbApi';
 import VideoPlayer from 'components/videoplayer';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { MovieDetail } from 'interfaces/MovideDetail';
+import { IComment, MovieDetail } from 'interfaces/MovideDetail';
 import { FixMeLater } from 'interfaces/Migrate';
 import apiConfig from 'api/apiConfig';
 import MovieList from 'components/movie-list/MovieList';
@@ -27,6 +27,27 @@ const videoJsOptions = {
     },
   ],
 };
+
+const commentData: IComment[] = [
+  {
+    id: 1,
+    text: 'Example comment here.',
+    author: 'user2',
+    children: [
+      {
+        id: 2,
+        text: 'Another example comment text.',
+        author: 'user3',
+      },
+    ],
+  },
+  {
+    id: 4,
+    text: 'Example comment here 2.',
+    author: 'user5',
+    children: [],
+  },
+];
 
 export default function Theater({}: Props): ReactElement {
   const { category, id } = useParams<RouterParams>();
@@ -76,7 +97,7 @@ export default function Theater({}: Props): ReactElement {
                 </div>
                 <div className="pr-6">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments />
+                  <Comments comments={commentData} />
                 </div>
               </div>
               <div className="w-1/4 bg-gray-700 pr-6 text-black">Banner QC</div>

@@ -50,21 +50,21 @@ export interface MovieDetail {
 }
 
 // ======== Comment interfaces==========
-export interface Child {
+export interface ICommentChild {
   id: number;
   text: string;
   author: string;
-}
-
-export interface Comment {
-  id: number;
-  text: string;
-  author: string;
-  children?: Child[];
 }
 
 export interface IComment {
+  id: number;
+  text: string;
+  author: string;
+  children?: ICommentChild[];
+}
+
+export interface ICommentData {
   title?: string;
   author?: string;
-  comments?: Comment[];
+  comments?: IComment[] | undefined;
 }
