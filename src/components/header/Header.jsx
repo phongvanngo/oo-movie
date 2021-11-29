@@ -27,6 +27,10 @@ const headerNav = [
     display: 'Sign In',
     path: '/sign-in',
   },
+  {
+    display: 'NguyenKiet',
+    path: '/profile',
+  },
 ];
 
 const Header = () => {
