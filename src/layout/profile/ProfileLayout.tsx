@@ -1,10 +1,13 @@
 import { profile } from 'console';
 import React, { ReactChildren, ReactElement } from 'react';
-import { useLocation } from 'react-router';
+import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 import backgroundImage from 'testimage/captain.jpg';
 import './profile-layout.scss';
 import { BsFillArrowRightCircleFill } from 'react-icons/bs';
+import { SignOut } from 'module/auth';
+import { useAppDispatch } from 'redux/hooks';
+import { setCurrentUser } from 'redux/reducer/authenticateSlice';
 
 interface Props {
   children: ReactChildren | ReactElement;
@@ -33,11 +36,6 @@ const profileNav = [
     display: 'Collection',
     path: '/my-collection',
   },
-  {
-    id: 5,
-    display: 'Sign Out',
-    path: '/sign-out',
-  },
 ];
 
 export default function ProfileLayout({
@@ -46,8 +44,15 @@ export default function ProfileLayout({
   userName,
 }: Props): ReactElement {
   const { pathname } = useLocation();
+  const history = useHistory();
 
-  const active = profileNav.findIndex((e) => e.path === pathname);
+  const dispatch = useAppDispatch();
+
+  const LogOut = () => {
+    SignOut();
+    dispatch(setCurrentUser(null));
+    history.push('/');
+  };
 
   return (
     <>
@@ -78,6 +83,16 @@ export default function ProfileLayout({
                 </Link>
               </div>
             ))}
+            <div
+              className={`profile__sidebar__menu__item `}
+              onClick={() => {
+                LogOut();
+              }}
+            >
+              <div className="profile__sidebar__menu__item__content">
+                Sign Out{' '}
+              </div>
+            </div>
           </div>
         </div>
 

@@ -1,10 +1,13 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 import { Link, useLocation } from 'react-router-dom';
 
 import './header.scss';
 
 import logo from '../../assets/tmovie.png';
+import { auth } from 'config/firebase';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
 
 const headerNav = [
   {
@@ -39,6 +42,8 @@ const Header = () => {
 
   const active = headerNav.findIndex((e) => e.path === pathname);
 
+  const globalUserState = useAppSelector(selectorUser);
+
   useEffect(() => {
     const shrinkHeader = () => {
       if (
@@ -64,11 +69,25 @@ const Header = () => {
           <Link to="/">tMovies</Link>
         </div>
         <ul className="header__nav">
-          {headerNav.map((e, i) => (
-            <li key={i} className={`${i === active ? 'active' : ''}`}>
-              <Link to={e.path}>{e.display}</Link>
-            </li>
-          ))}
+          {headerNav.map((e, i) => {
+            if (globalUserState) {
+              if (e.path !== '/sign-in') {
+                return (
+                  <li key={i} className={`${i === active ? 'active' : ''}`}>
+                    <Link to={e.path}>{e.display}</Link>
+                  </li>
+                );
+              }
+            } else {
+              if (e.path !== '/profile') {
+                return (
+                  <li key={i} className={`${i === active ? 'active' : ''}`}>
+                    <Link to={e.path}>{e.display}</Link>
+                  </li>
+                );
+              }
+            }
+          })}
         </ul>
       </div>
     </div>

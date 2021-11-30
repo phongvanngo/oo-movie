@@ -5,27 +5,29 @@ import { BsFacebook } from 'react-icons/bs';
 import { Link, useHistory } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import { SignInWithSocialMedia } from '../../module/auth';
-import { Providers } from '../../config/firebase';
+import { auth, Providers } from '../../config/firebase';
 import './login.scss';
+import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { setCurrentUser } from 'redux/reducer/authenticateSlice';
 
 interface Props {}
 
 export default function LoginPage({}: Props): ReactElement {
-  const [authenticating, setAuthenticating] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const history = useHistory();
+
+  const dispatch = useAppDispatch();
 
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== '') setError('');
 
-    setAuthenticating(true);
-
     SignInWithSocialMedia(provider)
       .then((result) => {
         history.push('/');
+        const user = result.user?.toJSON();
+        dispatch(setCurrentUser(user));
       })
       .catch((error) => {
-        setAuthenticating(false);
         setError(error.message);
       });
   };
