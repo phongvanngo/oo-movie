@@ -12,6 +12,27 @@ const Header = () => {
 
   console.log('log from header', globalUserState);
 
+  const DropDownHeader = (attr) => (
+    <div
+      className={`header__dropdown border border-black border-opacity-60 drop-shadow-2xl w-full absolute rounded-md ${attr}`}
+    >
+      <Link
+        className="py-2 hover:bg-opacity-50  hover:bg-black w-full flex justify-center"
+        to="/profile"
+        style={{ color: 'white', fontWeight: 500, fontSize: '20px' }}
+      >
+        Profile
+      </Link>
+      <Link
+        className="py-2 hover:bg-opacity-50  hover:bg-black w-full flex justify-center"
+        to="#"
+        style={{ color: 'white', fontWeight: 500, fontSize: '20px' }}
+      >
+        Sign out
+      </Link>
+    </div>
+  );
+
   const headerNav = [
     {
       display: 'Home',
@@ -71,8 +92,16 @@ const Header = () => {
               if (e.path !== '/sign-in') {
                 if (e.path === '/profile') {
                   return (
-                    <li key={i} className={`${i === active ? 'active' : ''}`}>
-                      <Link to={e.path}>{globalUserState.displayName}</Link>
+                    <li
+                      key={i}
+                      className={`${
+                        i === active ? 'active' : ''
+                      } header__profile`}
+                    >
+                      <Link to="#" className=" ">
+                        {globalUserState.displayName}
+                      </Link>
+                      <DropDownHeader />
                     </li>
                   );
                 }
