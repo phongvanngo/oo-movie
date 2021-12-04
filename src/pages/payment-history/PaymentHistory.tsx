@@ -6,7 +6,7 @@ interface Props {}
 
 const HistoryCard = (props: FixMeLater): ReactElement => {
   return (
-    <div className="p-4 m-2 bg-white rounded-2xl text-black mb-4">
+    <div className="p-4  bg-white rounded-2xl text-black mb-5">
       <div className="flex items-center mb-1.5">
         <div className="mr-3">#123</div>
         <div className="mr-3">Payment for NK</div>

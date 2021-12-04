@@ -1,30 +1,16 @@
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  RouteComponentProps,
-} from 'react-router-dom';
-import 'swiper/swiper.min.css';
-import './assets/boxicons-2.0.7/css/boxicons.min.css';
-import './App.scss';
-
-import { auth } from './config/firebase';
-import AuthRoute from 'module/auth/AuthRouter';
-
-import Header from './components/header/Header';
-import Footer from './components/footer/Footer';
-
-import routes from './config/routes';
+import ProfileLayout from 'layout/profile/ProfileLayout';
+import PrivateRoute from 'module/auth/PrivateRoute';
 import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useAppDispatch } from 'redux/hooks';
 import { setCurrentUser } from 'redux/reducer/authenticateSlice';
-import ProfileLayout from 'layout/profile/ProfileLayout';
-import Home from 'pages/Home';
-import Profile from 'pages/profile/Profile';
-import PaymentHistory from 'pages/payment-history/PaymentHistory';
-import LoginPage from 'pages/login/Login';
-import PrivateRoute from 'module/auth/PrivateRoute';
-import Plan from 'pages/plan/Plan';
+import 'swiper/swiper.min.css';
+import './App.scss';
+import './assets/boxicons-2.0.7/css/boxicons.min.css';
+import Footer from './components/footer/Footer';
+import Header from './components/header/Header';
+import { auth } from './config/firebase';
+import routes from './config/routes';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -68,7 +54,9 @@ function App() {
               />
             );
           }
-          return <Route path={route.path} component={route.component} />;
+          return (
+            <Route key={index} path={route.path} component={route.component} />
+          );
         })}
         ;
       </Switch>

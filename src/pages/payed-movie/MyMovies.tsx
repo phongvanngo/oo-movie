@@ -24,7 +24,7 @@ export default function MyMovies({}: Props): ReactElement {
   }, []);
 
   return (
-    <div className="p-4">
+    <>
       <div className="font-semibold mb-4 text-lg">Recent Movies</div>
       <div className="movie-slide mb-10">
         <Swiper
@@ -44,11 +44,11 @@ export default function MyMovies({}: Props): ReactElement {
       <div className="font-semibold mb-4 text-lg">My movies</div>
       <div className="grid grid-cols-4 gap-3">
         {items.map((item, i) => (
-          <div className="w-44">
+          <div className="w-44" key={i}>
             <MovieCard key={i} item={item} category={category.movie} />
           </div>
         ))}
       </div>
-    </div>
+    </>
   );
 }

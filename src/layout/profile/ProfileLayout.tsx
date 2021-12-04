@@ -97,7 +97,7 @@ export default function ProfileLayout({
         <div className="profile__main">
           <div className="profile__main__notification">Welcome {userName}</div>
           <div className="profile__main__content">
-            <div>{children}</div>
+            <div className="p-4">{children}</div>
           </div>
         </div>
 
