@@ -38,31 +38,14 @@
   display: flex;
   padding: 0 2rem;
 
-  @keyframes popup {
-    from {
-      opacity: 0;
-      transform: translateY(-100px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
   &__sidebar {
     background-color: $bg-content-color;
     position: relative;
     flex: 0.25;
     margin-top: -140px;
-    margin-bottom: 30px;
+    height: 580px;
     border-radius: 10px;
     margin-right: 1rem;
-
-    // @include tablet {
-    //   display: none;
-    // }
-    animation-name: popup;
-    animation-duration: 1s;
 
     &__avatar img {
       position: relative;
@@ -135,15 +118,27 @@
     }
   }
 
+  @keyframes popup {
+    from {
+      opacity: 0;
+      transform: translateY(-100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   // Main content
   &__main {
     margin-left: 1rem;
     flex: 0.75;
-    // width: 100%;
     padding: 10px 0;
     display: flex;
     flex-flow: column;
-
+    animation-name: popup;
+    animation-duration: 1s;
+    overflow-x: hidden;
     & > * {
       background-color: $bg-content-color;
       border-radius: 10px;

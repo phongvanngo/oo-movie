@@ -1,5 +1,5 @@
 import { SignOut } from 'module/auth';
-import React, { ReactChildren, ReactElement } from 'react';
+import React, { ReactChildren, ReactElement, ReactNode } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 import { useAppDispatch } from 'redux/hooks';
@@ -8,9 +8,9 @@ import backgroundImage from 'testimage/captain.jpg';
 import './profile-layout.scss';
 
 interface Props {
-  children: ReactChildren | ReactElement;
+  children: ReactNode;
   currentRoute?: string;
-  userName: string;
+  userName?: string;
 }
 
 const profileNav = [
@@ -26,7 +26,7 @@ const profileNav = [
   },
   {
     id: 3,
-    display: 'Your Movies',
+    display: 'My Movies',
     path: '/my-movies',
   },
   {

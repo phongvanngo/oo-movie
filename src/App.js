@@ -18,6 +18,13 @@ import routes from './config/routes';
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from 'redux/hooks';
 import { setCurrentUser } from 'redux/reducer/authenticateSlice';
+import ProfileLayout from 'layout/profile/ProfileLayout';
+import Home from 'pages/Home';
+import Profile from 'pages/profile/Profile';
+import PaymentHistory from 'pages/payment-history/PaymentHistory';
+import LoginPage from 'pages/login/Login';
+import PrivateRoute from 'module/auth/PrivateRoute';
+import Plan from 'pages/plan/Plan';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -41,23 +48,29 @@ function App() {
     <Router>
       <Header />
       <Switch>
-        {routes.map((route, index) => (
-          <Route
-            key={index}
-            path={route.path}
-            exact={route.exact}
-            render={(routeProps) => {
-              if (route.protected)
-                return (
-                  <AuthRoute>
-                    <route.component {...routeProps} />
-                  </AuthRoute>
-                );
-
-              return <route.component {...routeProps} />;
-            }}
-          />
-        ))}
+        {routes.map((route, index) => {
+          if (route.protected) {
+            if (route.isProfile) {
+              return (
+                <PrivateRoute
+                  key={index}
+                  path={route.path}
+                  layout={ProfileLayout}
+                  component={route.component}
+                />
+              );
+            }
+            return (
+              <PrivateRoute
+                key={index}
+                path={route.path}
+                component={route.component}
+              />
+            );
+          }
+          return <Route path={route.path} component={route.component} />;
+        })}
+        ;
       </Switch>
       <Footer />
     </Router>
