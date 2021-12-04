@@ -16,14 +16,18 @@ import Footer from './components/footer/Footer';
 
 import routes from './config/routes';
 import { useEffect, useState } from 'react';
+import { useAppDispatch } from 'redux/hooks';
+import { setCurrentUser } from 'redux/reducer/authenticateSlice';
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log('User sign in');
+        console.log('User signed in');
+        dispatch(setCurrentUser(user.toJSON()));
       } else {
         console.log('No user detected');
       }

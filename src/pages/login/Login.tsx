@@ -1,14 +1,14 @@
-import React, { ReactElement, useRef, useEffect, useState } from 'react';
-import PageHeader from '../../components/page-header/PageHeader';
-import { FcGoogle } from 'react-icons/fc';
-import { BsFacebook } from 'react-icons/bs';
-import { Link, useHistory } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
-import { SignInWithSocialMedia } from '../../module/auth';
-import { auth, Providers } from '../../config/firebase';
-import './login.scss';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import { BsFacebook } from 'react-icons/bs';
+import { FcGoogle } from 'react-icons/fc';
+import { useHistory } from 'react-router-dom';
+import { useAppDispatch } from 'redux/hooks';
 import { setCurrentUser } from 'redux/reducer/authenticateSlice';
+import PageHeader from '../../components/page-header/PageHeader';
+import { Providers } from '../../config/firebase';
+import { SignInWithSocialMedia } from '../../module/auth';
+import './login.scss';
 
 interface Props {}
 

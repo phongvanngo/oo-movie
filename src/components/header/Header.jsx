@@ -1,48 +1,45 @@
-import React, { useRef, useEffect, useState } from 'react';
-
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-
-import './header.scss';
-
-import logo from '../../assets/tmovie.png';
-import { auth } from 'config/firebase';
-import { useAppSelector, useAppDispatch } from 'redux/hooks';
+import { useAppSelector } from 'redux/hooks';
 import { selectorUser } from 'redux/reducer/authenticateSlice';
-
-const headerNav = [
-  {
-    display: 'Home',
-    path: '/',
-  },
-  {
-    display: 'Movies',
-    path: '/movie',
-  },
-  {
-    display: 'TV Series',
-    path: '/tv',
-  },
-  {
-    display: 'Plan',
-    path: '/plan',
-  },
-  {
-    display: 'Sign In',
-    path: '/sign-in',
-  },
-  {
-    display: 'NguyenKiet',
-    path: '/profile',
-  },
-];
+import logo from '../../assets/tmovie.png';
+import './header.scss';
 
 const Header = () => {
   const { pathname } = useLocation();
   const headerRef = useRef(null);
+  const globalUserState = useAppSelector(selectorUser);
+
+  console.log('log from header', globalUserState);
+
+  const headerNav = [
+    {
+      display: 'Home',
+      path: '/',
+    },
+    {
+      display: 'Movies',
+      path: '/movie',
+    },
+    {
+      display: 'TV Series',
+      path: '/tv',
+    },
+    {
+      display: 'Plan',
+      path: '/plan',
+    },
+    {
+      display: 'Sign In',
+      path: '/sign-in',
+    },
+    {
+      display: 'User',
+      path: '/profile',
+    },
+  ];
 
   const active = headerNav.findIndex((e) => e.path === pathname);
-
-  const globalUserState = useAppSelector(selectorUser);
 
   useEffect(() => {
     const shrinkHeader = () => {
@@ -72,6 +69,14 @@ const Header = () => {
           {headerNav.map((e, i) => {
             if (globalUserState) {
               if (e.path !== '/sign-in') {
+                if (e.path === '/profile') {
+                  return (
+                    <li key={i} className={`${i === active ? 'active' : ''}`}>
+                      <Link to={e.path}>{globalUserState.displayName}</Link>
+                    </li>
+                  );
+                }
+
                 return (
                   <li key={i} className={`${i === active ? 'active' : ''}`}>
                     <Link to={e.path}>{e.display}</Link>

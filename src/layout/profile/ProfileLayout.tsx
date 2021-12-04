@@ -1,13 +1,11 @@
-import { profile } from 'console';
+import { SignOut } from 'module/auth';
 import React, { ReactChildren, ReactElement } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
-import backgroundImage from 'testimage/captain.jpg';
-import './profile-layout.scss';
-import { BsFillArrowRightCircleFill } from 'react-icons/bs';
-import { SignOut } from 'module/auth';
 import { useAppDispatch } from 'redux/hooks';
 import { setCurrentUser } from 'redux/reducer/authenticateSlice';
+import backgroundImage from 'testimage/captain.jpg';
+import './profile-layout.scss';
 
 interface Props {
   children: ReactChildren | ReactElement;

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FixMeLater } from 'interfaces/Migrate';
-import type { RootState, AppDispatch } from '../store';
+import type { RootState } from '../store';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 

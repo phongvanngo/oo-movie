@@ -1,6 +1,5 @@
 import firebase from 'firebase/compat/app';
 import { auth } from '../../config/firebase';
-import { Redirect, useHistory } from 'react-router-dom';
 
 export const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) =>
   new Promise<firebase.auth.UserCredential>((resolve, reject) => {
