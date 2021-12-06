@@ -9,6 +9,7 @@ import Profile from 'pages/profile/Profile';
 import PaymentHistory from 'pages/payment-history/PaymentHistory';
 import MyMovies from 'pages/payed-movie/MyMovies';
 import MyCollection from 'pages/my-collection/MyCollection';
+import Checkout from 'pages/checkout/Checkout';
 
 const routes: IRoute[] = [
   {
@@ -61,6 +62,14 @@ const routes: IRoute[] = [
     protected: true,
   },
   {
+    path: '/checkout',
+    exact: false,
+    component: Checkout,
+    isProfile: false,
+    name: 'Checkout',
+    protected: true,
+  },
+  {
     path: '/:category/search/:keyword',
     exact: false,
     component: Catalog,
@@ -102,3 +111,44 @@ const routes: IRoute[] = [
   },
 ];
 export default routes;
+
+//Header nav bar
+export const headerNav = [
+  {
+    display: 'Home',
+    path: '/',
+  },
+  {
+    display: 'Movies',
+    path: '/movie',
+  },
+  {
+    display: 'TV Series',
+    path: '/tv',
+  },
+  {
+    display: 'Plan',
+    path: '/plan',
+  },
+  {
+    display: 'Sign In',
+    path: '/sign-in',
+  },
+  {
+    display: 'User',
+    path: '/profile',
+  },
+];
+
+export const linkDropDown = [
+  {
+    id: 1,
+    name: 'Profile',
+    path: '/profile',
+  },
+  {
+    id: 2,
+    name: 'Cart',
+    path: '/cart',
+  },
+];

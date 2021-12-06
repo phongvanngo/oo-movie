@@ -1,0 +1,71 @@
+@use '../../scss/' as *;
+
+.payment__wrapper {
+  padding: 0 8%;
+
+  & > * {
+    background: rgba(0, 0, 0, 0.336);
+    padding: 30px;
+    margin-bottom: 8rem;
+  }
+
+  & > * ~ * {
+    margin-left: 60px;
+  }
+
+  .payment__information {
+  }
+
+  .payment__items {
+    .promotion__button {
+      @include flex(center, center);
+
+      border: 1px solid white;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.2s linear;
+      text-align: center;
+    }
+
+    .promotion__button-small {
+      font-size: 15px;
+      padding: 4px 10px;
+    }
+
+    .promotion__button-small:hover {
+      background: white;
+      color: $main-color;
+      font-weight: 600;
+    }
+
+    .promotion__button-big {
+      padding: 8px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .promotion__button-big:hover {
+      background: $main-color;
+      color: $white;
+      border: none;
+      transform: scale(1.04);
+    }
+  }
+}
+
+.promotion__input__content {
+  background-color: $bg-content-color;
+}
+
+.payment__input__wrapper {
+  margin-bottom: 20px;
+
+  &-label {
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+
+  &-content {
+    background-color: $bg-content-color;
+    width: 100%;
+  }
+}

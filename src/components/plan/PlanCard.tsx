@@ -1,6 +1,7 @@
 import React from 'react';
 import './plan-card.scss';
 import { AiFillLike } from 'react-icons/ai';
+import Button from 'components/button/Button';
 
 interface Props {
   //   name: string;
@@ -42,9 +43,8 @@ const PlanCard = (props: Props) => {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className="border cursor-pointer border-white px-8 py-2 rounded-full hover:bg-primary hover:border-opacity-0 hover:scale-105 transform transition duration-300">
-            Subscribe
-          </div>
+          {/* @ts-ignore */}
+          <Button className="medium">Subscribe</Button>
         </div>
       </div>
     </div>

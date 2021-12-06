@@ -1,7 +1,9 @@
+import { headerNav, linkDropDown } from 'config/routes';
+import { SignOut } from 'module/auth';
 import React, { useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAppSelector } from 'redux/hooks';
-import { selectorUser } from 'redux/reducer/authenticateSlice';
+import { Link, useLocation, useHistory } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
 import logo from '../../assets/tmovie.png';
 import './header.scss';
 
@@ -9,56 +11,42 @@ const Header = () => {
   const { pathname } = useLocation();
   const headerRef = useRef(null);
   const globalUserState = useAppSelector(selectorUser);
+  const history = useHistory();
+  const dispatch = useAppDispatch();
 
   console.log('log from header', globalUserState);
 
-  const DropDownHeader = (attr) => (
+  const HeaderSignOut = () => {
+    SignOut();
+    dispatch(setCurrentUser(null));
+    history.push('/');
+  };
+
+  const DropDownHeader = () => (
     <div
-      className={`header__dropdown border border-black border-opacity-60 drop-shadow-2xl w-full absolute rounded-md ${attr}`}
+      className={`header__dropdown border border-black border-opacity-60 drop-shadow-2xl w-full absolute rounded-md `}
     >
-      <Link
-        className="py-2 hover:bg-opacity-50  hover:bg-black w-full flex justify-center"
-        to="/profile"
-        style={{ color: 'white', fontWeight: 500, fontSize: '20px' }}
-      >
-        Profile
-      </Link>
-      <Link
-        className="py-2 hover:bg-opacity-50  hover:bg-black w-full flex justify-center"
+      {linkDropDown.map((linkItem) => (
+        <Link
+          key={linkItem.id}
+          className="py-2 hover:bg-opacity-50  hover:bg-black w-full flex justify-center"
+          to={linkItem.path}
+          style={{ color: 'white', fontWeight: 500, fontSize: '20px' }}
+        >
+          {linkItem.name}
+        </Link>
+      ))}
+
+      <div
+        className="cursor-pointer py-2 hover:bg-opacity-50  hover:bg-black w-full flex justify-center"
         to="#"
+        onClick={HeaderSignOut}
         style={{ color: 'white', fontWeight: 500, fontSize: '20px' }}
       >
         Sign out
-      </Link>
+      </div>
     </div>
   );
-
-  const headerNav = [
-    {
-      display: 'Home',
-      path: '/',
-    },
-    {
-      display: 'Movies',
-      path: '/movie',
-    },
-    {
-      display: 'TV Series',
-      path: '/tv',
-    },
-    {
-      display: 'Plan',
-      path: '/plan',
-    },
-    {
-      display: 'Sign In',
-      path: '/sign-in',
-    },
-    {
-      display: 'User',
-      path: '/profile',
-    },
-  ];
 
   const active = headerNav.findIndex((e) => e.path === pathname);
 
