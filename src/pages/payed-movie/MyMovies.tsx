@@ -35,7 +35,12 @@ export default function MyMovies({}: Props): ReactElement {
         >
           {items.map((item, i) => (
             <SwiperSlide key={i}>
-              <MovieCard key={i} item={item} category={category.movie} />
+              <MovieCard
+                key={i}
+                item={item}
+                category={category.movie}
+                progress={'20%'}
+              />
             </SwiperSlide>
           ))}
         </Swiper>

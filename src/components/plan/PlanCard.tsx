@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import './plan-card.scss';
 import { AiFillLike } from 'react-icons/ai';
 import Button from 'components/button/Button';
@@ -8,9 +8,10 @@ interface Props {
   //   price: number;
   //   content: string[];
   //   link: string;
+  onCheckout: MouseEventHandler<HTMLDivElement>;
 }
 
-const PlanCard = (props: Props) => {
+const PlanCard = ({ onCheckout }: Props) => {
   return (
     <div className="w-80 card__container p-6 mb-10 drop-shadow-md ">
       <div className="z-40">
@@ -44,7 +45,9 @@ const PlanCard = (props: Props) => {
         </div>
         <div className="flex justify-center items-center">
           {/* @ts-ignore */}
-          <Button className="medium">Subscribe</Button>
+          <Button onClick={() => onCheckout('Plan 1 ne')} className="medium">
+            Subscribe
+          </Button>
         </div>
       </div>
     </div>

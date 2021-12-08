@@ -5,10 +5,28 @@ import 'react-credit-cards/es/styles-compiled.css';
 import PaymentCard from './PaymentCard';
 import './checkout.scss';
 import Button from 'components/button/Button';
+import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
+import { RouteComponentProps, useHistory, useLocation } from 'react-router';
 
-interface Props {}
+interface Props {
+  //   location: RouteComponentProps;
+}
+
+interface IListPurchasing {
+  name: string;
+  price: number;
+}
 
 export default function Checkout({}: Props): ReactElement {
+  const { state } = useLocation();
+
+  const [listPurchasing, setListPurchasing] = useState<IListPurchasing[] | []>([
+    {
+      name: 'plan christmas',
+      price: 100,
+    },
+  ]);
+  const history = useHistory();
   const [cardProps, setCardProps] = useState<ReactCreditCardProps>({
     cvc: '',
     expiry: '',
@@ -17,6 +35,41 @@ export default function Checkout({}: Props): ReactElement {
     number: '',
     issuer: '',
   });
+
+  console.log(state);
+
+  const [promotionState, setPromotionState] = useState<string>('');
+
+  const setModalVisible = () => {
+    const modal = document.querySelector(`#PaymentNotification`);
+    if (modal) {
+      modal.classList.toggle('active');
+    }
+  };
+
+  const pushToMovie = () => {
+    //Test route
+    history.push('/movie/568124');
+  };
+
+  const pushToHome = () => {
+    history.push('/');
+  };
+
+  const onPromotionChange = (e: React.FormEvent<HTMLInputElement>) => {
+    console.log(e.currentTarget.value);
+    setPromotionState(e.currentTarget.value);
+  };
+
+  const AddPromotion = () => {
+    const promotion: IListPurchasing = {
+      name: promotionState,
+      price: -30,
+    };
+    const newPurchaseList = [...listPurchasing];
+    newPurchaseList.push(promotion);
+    setListPurchasing(newPurchaseList);
+  };
 
   return (
     <>
@@ -28,19 +81,15 @@ export default function Checkout({}: Props): ReactElement {
         </div>
         <div className="w-2/5 payment__items ">
           <div className="font-semibold mb-8">Order Summary</div>
-          <div className="pb-4">
-            <div className="flex justify-between mb-4 ">
-              <div>Christmas Plan v2</div>
-              <div>$30</div>
-            </div>
-            <div className="flex justify-between mb-4 ">
-              <div>Christmas Plan v2</div>
-              <div>$30</div>
-            </div>
-            <div className="flex justify-between mb-4 ">
-              <div>Promotion code - KSHARKINC</div>
-              <div>-$30</div>
-            </div>
+
+          <div className="pb-4" id="purchasing-item">
+            {listPurchasing &&
+              listPurchasing.map((item, index) => (
+                <div key={index} className="flex justify-between mb-4 ">
+                  <div>{item.name}</div>
+                  <div>{item.price}</div>
+                </div>
+              ))}
           </div>
 
           <hr className="mb-4" />
@@ -53,8 +102,15 @@ export default function Checkout({}: Props): ReactElement {
                 type="tel"
                 name="code"
                 placeholder="Promotion code"
+                value={promotionState}
+                onChange={onPromotionChange}
               />
-              <div className="promotion__button promotion__button-small">
+              <div
+                onClick={() => {
+                  AddPromotion();
+                }}
+                className="promotion__button promotion__button-small"
+              >
                 Use code
               </div>
             </div>
@@ -75,11 +131,28 @@ export default function Checkout({}: Props): ReactElement {
             </div>
           </div>
 
-          <div className="promotion__button promotion__button-big">
+          <div
+            onClick={setModalVisible}
+            className="promotion__button promotion__button-big"
+          >
             Check out
           </div>
         </div>
       </div>
+      {/* @ts-ignore */}
+      <Modal active={false} id="PaymentNotification">
+        {/* @ts-ignore */}
+        <ModalWithButton
+          onOk={pushToMovie}
+          okContent="Watch now"
+          abortContent="Later"
+          onAbort={pushToHome}
+        >
+          <div className="flex justify-center items-center text-xl text-center">
+            <div>Purchase successfully! Get your pop corn now!</div>
+          </div>
+        </ModalWithButton>
+      </Modal>
     </>
   );
 }

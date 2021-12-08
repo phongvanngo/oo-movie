@@ -2,8 +2,9 @@ import ProfileLayout from 'layout/profile/ProfileLayout';
 import PrivateRoute from 'module/auth/PrivateRoute';
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { useAppDispatch } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { setCurrentUser } from 'redux/reducer/authenticateSlice';
+import { selectorLoader, setLoading } from 'redux/reducer/loader';
 import 'swiper/swiper.min.css';
 import './App.scss';
 import './assets/boxicons-2.0.7/css/boxicons.min.css';
@@ -14,6 +15,7 @@ import routes from './config/routes';
 
 function App() {
   const [loading, setLoading] = useState(true);
+  //   const loading = useAppSelector(selectorLoader);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -24,6 +26,7 @@ function App() {
       } else {
         console.log('No user detected');
       }
+      //   dispatch(setLoading(false));
       setLoading(false);
     });
   }, []);

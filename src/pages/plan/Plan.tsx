@@ -1,6 +1,7 @@
 import PlanCard from 'components/plan/PlanCard';
 import React, { ReactElement, useEffect, useRef } from 'react';
 import PageHeader from '../../components/page-header/PageHeader';
+import { useHistory } from 'react-router-dom';
 
 interface Props {}
 
@@ -11,6 +12,15 @@ export default function Plan({}: Props): ReactElement {
     window.scrollTo({ top: SCROLL_TOP_LOCATION, behavior: 'smooth' });
   }, []);
 
+  const history = useHistory();
+
+  const PushToCheckout = () => {
+    history.push({
+      pathname: '/checkout',
+      state: 'Hello data tu plan ne',
+    });
+  };
+
   return (
     <>
       <PageHeader></PageHeader>
@@ -20,9 +30,9 @@ export default function Plan({}: Props): ReactElement {
             Choose your appropriate plan for you
           </div>
           <div className="md:grid grid-cols-3 gap-10">
-            <PlanCard />
-            <PlanCard />
-            <PlanCard />
+            <PlanCard onCheckout={PushToCheckout} />
+            <PlanCard onCheckout={PushToCheckout} />
+            <PlanCard onCheckout={PushToCheckout} />
           </div>
         </div>
       </div>

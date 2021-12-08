@@ -11,15 +11,42 @@ import VideoList from './VideoList';
 import MovieList from '../../components/movie-list/MovieList';
 import VideoPlayer from 'components/videoplayer';
 import Button, { OutlineButton } from 'components/button/Button';
+import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
 
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
 
-  let hisrory = useHistory();
+  let history = useHistory();
 
   const location = useLocation();
+
+  const setModalVisible = () => {
+    const modal = document.querySelector(`#PaymentNotification`);
+    if (modal) {
+      modal.classList.toggle('active');
+    }
+  };
+
+  const handleWatchMovieEvent = () => {
+    if (false) {
+      pushToMovie();
+    } else {
+      setModalVisible();
+    }
+  };
+
+  const pushToMovie = () => {
+    history.push('/movie/524434/watching');
+  };
+
+  const pushToCheckout = () => {
+    history.push({
+      pathname: '/checkout',
+      state: item,
+    });
+  };
 
   useEffect(() => {
     const getDetail = async () => {
@@ -71,11 +98,7 @@ const Detail = () => {
                 <CastList id={item.id} />
               </div>
               <div className="btns">
-                <Button
-                  onClick={() => hisrory.push(location.pathname + '/watching')}
-                >
-                  Watch now
-                </Button>
+                <Button onClick={handleWatchMovieEvent}>Watch now</Button>
                 <OutlineButton>Watch Trailer</OutlineButton>
               </div>
             </div>
@@ -91,6 +114,22 @@ const Detail = () => {
               <MovieList category={category} type="similar" id={item.id} />
             </div>
           </div>
+          <Modal active={false} id="PaymentNotification">
+            {/* @ts-ignore */}
+            <ModalWithButton
+              onOk={pushToCheckout}
+              onAbort={() => {}}
+              okContent="Purchase"
+              abortContent="Later"
+            >
+              <div className="flex justify-center items-center text-xl text-center">
+                <div>
+                  You dont have permission to watch this movie. Buy it or
+                  Subscribe a plan
+                </div>
+              </div>
+            </ModalWithButton>
+          </Modal>
         </>
       )}
     </>
