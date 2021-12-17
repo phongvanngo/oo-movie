@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import './button.scss';
@@ -27,6 +27,28 @@ export const OutlineButton = (props) => {
 
 Button.propTypes = {
   onClick: PropTypes.func,
+};
+
+export const OutlineButtonToggle = (props) => {
+  const [isActive, setIsActive] = useState(false);
+
+  const handleOnClick = () => {
+    setIsActive(!isActive);
+    if (props.onClick) {
+      props.onClick(props.children);
+    }
+  };
+
+  return (
+    <Button
+      className={`btn-outline ${props.className} ${
+        isActive && 'btn-outline-active'
+      }`}
+      onClick={handleOnClick}
+    >
+      {props.children}
+    </Button>
+  );
 };
 
 export default Button;

@@ -7,7 +7,7 @@ import {
   formatCVC,
   formatExpirationDate,
   formatFormData,
-} from 'utils';
+} from 'utils/FormatPaymentCard';
 
 interface Props {
   cardProps: ReactCreditCardProps;
