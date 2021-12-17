@@ -30,10 +30,7 @@ Button.propTypes = {
 };
 
 export const OutlineButtonToggle = (props) => {
-  const [isActive, setIsActive] = useState(false);
-
   const handleOnClick = () => {
-    setIsActive(!isActive);
     if (props.onClick) {
       props.onClick(props.children);
     }
@@ -42,7 +39,7 @@ export const OutlineButtonToggle = (props) => {
   return (
     <Button
       className={`btn-outline ${props.className} ${
-        isActive && 'btn-outline-active'
+        props.isActive && 'btn-outline-active'
       }`}
       onClick={handleOnClick}
     >
