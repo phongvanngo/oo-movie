@@ -28,10 +28,10 @@ const MovieGrid = (props) => {
   const [activeCategories, setActiveCategories] = useState([]);
 
   //   ======= Get movie from api ========
-  useEffect(() => {
-    dispatch(getMovies());
-    // console.log(listMovies);
-  }, [listMovies, dispatch]);
+  //   useEffect(() => {
+  //     dispatch(getMovies());
+  //     // console.log(listMovies);
+  //   }, [listMovies, dispatch]);
 
   //   ====== Category de click vao thi filter
 
@@ -84,13 +84,42 @@ const MovieGrid = (props) => {
     setActiveCategories(newActiveCategories);
   };
 
+  //   Trigger khi click vao category item
   const FilterCategory = (selectedCate) => {
+    // Update danh sach category (Inactive va active luon)
     UpdateDisplayCategories(selectedCate);
+    // Update danh sach category active
     UpdateListSelectedCategories(selectedCate);
   };
 
-  const FilterMovies = (movies) => {};
+  //   Trigger moi khi danh sach category active thay doi
+  const FilterList = (items) => {
+    //   Truong hop khong co category nao dc filter thi chuyen thanh all
+    let newListItems = [...items];
+    if (activeCategories.length === 0) {
+      setItems(newListItems);
+    } else {
+      newListItems = items.filter((item) => {
+        // Voi 1 phim, xet toan bo category dc chon.
+        // Doi voi moi category dc chon, select some in movies category.
+        let isContains = false;
+        activeCategories.some((activeCate) => {
+          isContains = item.genre_ids.some((genre) => genre === activeCate.id);
+          return isContains;
+        });
+        return isContains;
+      });
+      setItems(newListItems);
+    }
+    return newListItems;
+  };
 
+  const UpdateLoadMoreItems = (newLoadItems) => {
+    const itemsFilterd = FilterList(newLoadItems);
+    setItems([...items, ...itemsFilterd]);
+  };
+
+  //   Trigger khi click All
   const ClearSelectedCategories = () => {
     let newCategories = [...categories];
     newCategories = newCategories.map((cate) => {
@@ -105,7 +134,7 @@ const MovieGrid = (props) => {
         };
       }
     });
-
+    setActiveCategories([]);
     setCategories(newCategories);
   };
 
@@ -142,13 +171,36 @@ const MovieGrid = (props) => {
         responseMovies = await tmdbApi.search(props.category, { params });
       }
       setItems(responseMovies.results);
-      console.log(responseMovies.results);
-      console.log(responseCategories?.genres);
+      //   console.log(responseMovies.results);
+      //   console.log(responseCategories?.genres);
       AddAttributeCategory(responseCategories?.genres);
       setTotalPage(responseMovies.total_pages);
     };
     getList();
   }, [props.category, keyword]);
+
+  //   Trigger moi khi active category thay doi => Get list movies moi nhat ve => filter => setState
+  useEffect(() => {
+    const getList = async () => {
+      let responseMovies = null;
+
+      const params = {};
+      switch (props.category) {
+        case category.movie:
+          responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
+            params,
+          });
+
+          break;
+        default:
+          responseMovies = await tmdbApi.getTvList(tvType.popular, {
+            params,
+          });
+      }
+      FilterList(responseMovies.results);
+    };
+    getList();
+  }, [activeCategories]);
 
   const loadMore = async () => {
     let response = null;
@@ -172,7 +224,7 @@ const MovieGrid = (props) => {
       };
       response = await tmdbApi.search(props.category, { params });
     }
-    setItems([...items, ...response.results]);
+    UpdateLoadMoreItems(response.results);
     setPage(page + 1);
   };
 
@@ -180,7 +232,7 @@ const MovieGrid = (props) => {
     <>
       <div className="section mb-3">
         <MovieSearch category={props.category} keyword={keyword} />
-        {categories && (
+        {categories.length > 0 && (
           <div className="flex overflow-x-hidden genre-list">
             <Swiper grabCursor={true} slidesPerView={'auto'}>
               <SwiperSlide>
@@ -223,7 +275,7 @@ const MovieGrid = (props) => {
   );
 };
 
-// =================== Search component =========
+// =================== Search component ================
 const MovieSearch = (props) => {
   const history = useHistory();
 
