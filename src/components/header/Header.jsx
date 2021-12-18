@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
+import { updateUserHistory } from 'redux/reducer/userHistory';
 import logo from '../../assets/tmovie.png';
 import './header.scss';
 
@@ -14,10 +15,9 @@ const Header = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
 
-  console.log('log from header', globalUserState);
-
   const HeaderSignOut = () => {
     SignOut();
+    dispatch(updateUserHistory({}));
     dispatch(setCurrentUser(null));
     history.push('/');
   };

@@ -9,7 +9,8 @@ import PageHeader from '../../components/page-header/PageHeader';
 import { Providers } from '../../config/firebase';
 import { SignInWithSocialMedia } from '../../module/auth';
 import './login.scss';
-
+import { FixMeLater } from 'interfaces/Migrate';
+import { updateUserHistory } from 'redux/reducer/userHistory';
 interface Props {}
 
 export default function LoginPage({}: Props): ReactElement {
@@ -26,10 +27,30 @@ export default function LoginPage({}: Props): ReactElement {
         history.push('/');
         const user = result.user?.toJSON();
         dispatch(setCurrentUser(user));
+        LocalStorageHandle(user);
       })
       .catch((error) => {
         setError(error.message);
       });
+  };
+
+  const LocalStorageHandle = (user: FixMeLater) => {
+    // localStorage.setItem('rememberMe', rememberMe);
+    // localStorage.getItem('rememberMe')
+    let thisUser = localStorage.getItem(user.email);
+
+    if (thisUser) {
+      dispatch(updateUserHistory(JSON.parse(thisUser)));
+    } else {
+      const thisUserEmail = user.email;
+      const newUSer = {
+        email: thisUserEmail,
+        isBoughtPlan: false,
+        boughtMovies: [],
+        historyMovies: [],
+      };
+      dispatch(updateUserHistory(newUSer));
+    }
   };
 
   const mainref = useRef<HTMLHeadingElement>(null);

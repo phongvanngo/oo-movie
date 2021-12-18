@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { setCurrentUser } from 'redux/reducer/authenticateSlice';
 import { selectorLoader, setLoading } from 'redux/reducer/loader';
+import { updateUserHistory } from 'redux/reducer/userHistory';
 import 'swiper/swiper.min.css';
 import './App.scss';
 import './assets/boxicons-2.0.7/css/boxicons.min.css';
@@ -21,8 +22,14 @@ function App() {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log('User signed in');
-        dispatch(setCurrentUser(user.toJSON()));
+        const userParsed = user.toJSON();
+        dispatch(setCurrentUser(userParsed));
+
+        //Truong hop reload lai page thi update state local storage (truong hop sign in roi)
+        const userLocalStorage = localStorage.getItem(`${userParsed.email}`);
+        if (userLocalStorage) {
+          dispatch(updateUserHistory(JSON.parse(userLocalStorage)));
+        }
       } else {
         console.log('No user detected');
       }

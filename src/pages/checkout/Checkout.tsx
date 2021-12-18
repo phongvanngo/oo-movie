@@ -1,5 +1,5 @@
 import PageHeader from 'components/page-header/PageHeader';
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import PaymentCard from './PaymentCard';
@@ -7,6 +7,12 @@ import './checkout.scss';
 import Button from 'components/button/Button';
 import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
 import { RouteComponentProps, useHistory, useLocation } from 'react-router';
+import { FixMeLater } from 'interfaces/Migrate';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import {
+  selectorUserHistory,
+  updateUserHistory,
+} from 'redux/reducer/userHistory';
 
 interface Props {
   //   location: RouteComponentProps;
@@ -18,14 +24,10 @@ interface IListPurchasing {
 }
 
 export default function Checkout({}: Props): ReactElement {
-  const { state } = useLocation();
+  // State luu tru giu lieu khi route khach push vao component nay
+  const { state } = useLocation<FixMeLater>();
 
-  const [listPurchasing, setListPurchasing] = useState<IListPurchasing[] | []>([
-    {
-      name: 'plan christmas',
-      price: 100,
-    },
-  ]);
+  const [listPurchasing, setListPurchasing] = useState<any>([]);
   const history = useHistory();
   const [cardProps, setCardProps] = useState<ReactCreditCardProps>({
     cvc: '',
@@ -36,7 +38,19 @@ export default function Checkout({}: Props): ReactElement {
     issuer: '',
   });
 
-  console.log(state);
+  const userHistory = useAppSelector(selectorUserHistory);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    let selectedItem = [
+      {
+        id: 0,
+        name: state.title,
+        price: state.price,
+      },
+    ];
+    setListPurchasing(selectedItem);
+  }, []);
 
   const [promotionState, setPromotionState] = useState<string>('');
 
@@ -45,6 +59,13 @@ export default function Checkout({}: Props): ReactElement {
     if (modal) {
       modal.classList.toggle('active');
     }
+    HandleLocalStorage();
+  };
+
+  const HandleLocalStorage = () => {
+    const newUserHistory = { ...userHistory };
+    newUserHistory.isBoughtPlan = true;
+    dispatch(updateUserHistory(newUserHistory));
   };
 
   const pushToMovie = () => {
@@ -83,11 +104,11 @@ export default function Checkout({}: Props): ReactElement {
           <div className="font-semibold mb-8">Order Summary</div>
 
           <div className="pb-4" id="purchasing-item">
-            {listPurchasing &&
-              listPurchasing.map((item, index) => (
+            {listPurchasing.length > 0 &&
+              listPurchasing.map((item: FixMeLater, index: FixMeLater) => (
                 <div key={index} className="flex justify-between mb-4 ">
                   <div>{item.name}</div>
-                  <div>{item.price}</div>
+                  <div>${item.price}</div>
                 </div>
               ))}
           </div>

@@ -2,10 +2,29 @@ import PlanCard from 'components/plan/PlanCard';
 import React, { ReactElement, useEffect, useRef } from 'react';
 import PageHeader from '../../components/page-header/PageHeader';
 import { useHistory } from 'react-router-dom';
+import { FixMeLater } from 'interfaces/Migrate';
 
 interface Props {}
 
 const SCROLL_TOP_LOCATION = 80;
+
+const listPlans = [
+  {
+    id: 0,
+    title: 'Christmas Plan',
+    price: 30,
+  },
+  {
+    id: 1,
+    title: 'All Year Plan',
+    price: 80,
+  },
+  {
+    id: 2,
+    title: 'Trail Plan',
+    price: 20,
+  },
+];
 
 export default function Plan({}: Props): ReactElement {
   useEffect(() => {
@@ -14,10 +33,10 @@ export default function Plan({}: Props): ReactElement {
 
   const history = useHistory();
 
-  const PushToCheckout = () => {
+  const PushToCheckout = (selectedPlan: FixMeLater) => {
     history.push({
       pathname: '/checkout',
-      state: 'Hello data tu plan ne',
+      state: selectedPlan,
     });
   };
 
@@ -30,9 +49,23 @@ export default function Plan({}: Props): ReactElement {
             Choose your appropriate plan for you
           </div>
           <div className="md:grid grid-cols-3 gap-10">
-            <PlanCard onCheckout={PushToCheckout} />
-            <PlanCard onCheckout={PushToCheckout} />
-            <PlanCard onCheckout={PushToCheckout} />
+            {listPlans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                title={plan.title}
+                price={plan.price}
+                onCheckout={PushToCheckout}
+              />
+            ))}
+
+            {/* <PlanCard
+              title="All Year Plan"
+              onCheckout={() => PushToCheckout('All Year Plan')}
+            />
+            <PlanCard
+              title="Trail Plan"
+              onCheckout={() => PushToCheckout('Trail Plan')}
+            /> */}
           </div>
         </div>
       </div>
