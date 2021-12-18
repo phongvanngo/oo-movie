@@ -25,9 +25,9 @@ interface IListPurchasing {
 
 export default function Checkout({}: Props): ReactElement {
   // State luu tru giu lieu khi route khach push vao component nay
-  const { state } = useLocation<FixMeLater>();
 
-  const [listPurchasing, setListPurchasing] = useState<any>([]);
+  const [listPurchasing, setListPurchasing] = useState<FixMeLater>([]);
+  const [itemPurchasing, setItemPurchasing] = useState<FixMeLater>(null);
   const history = useHistory();
   const [cardProps, setCardProps] = useState<ReactCreditCardProps>({
     cvc: '',
@@ -42,14 +42,29 @@ export default function Checkout({}: Props): ReactElement {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    let selectedItem = [
-      {
-        id: 0,
-        name: state.title,
-        price: state.price,
-      },
-    ];
-    setListPurchasing(selectedItem);
+    let itemFromStorage = JSON.parse(
+      localStorage.getItem('selectedItem') as FixMeLater
+    );
+
+    setItemPurchasing(itemFromStorage);
+
+    let selectedItem = null;
+    if (itemFromStorage.isPlan) {
+      selectedItem = {
+        name: itemFromStorage.item.title,
+        price: itemFromStorage.item.price,
+      };
+    } else {
+      selectedItem = {
+        name: itemFromStorage.item.title || itemFromStorage.item.name,
+        price: 20,
+      };
+    }
+
+    let listItems = [];
+    listItems.push(selectedItem);
+
+    setListPurchasing(listItems);
   }, []);
 
   const [promotionState, setPromotionState] = useState<string>('');
@@ -62,9 +77,16 @@ export default function Checkout({}: Props): ReactElement {
     HandleLocalStorage();
   };
 
+  // Thay doi local storage khi checkout.
   const HandleLocalStorage = () => {
     const newUserHistory = { ...userHistory };
-    newUserHistory.isBoughtPlan = true;
+    if (itemPurchasing.isPlan) {
+      newUserHistory.isBoughtPlan = true;
+    } else {
+      let newListBoughtMovies = [...newUserHistory.boughtMovies];
+      newListBoughtMovies.push(itemPurchasing.item);
+      newUserHistory.boughtMovies = newListBoughtMovies;
+    }
     dispatch(updateUserHistory(newUserHistory));
   };
 
@@ -78,7 +100,6 @@ export default function Checkout({}: Props): ReactElement {
   };
 
   const onPromotionChange = (e: React.FormEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget.value);
     setPromotionState(e.currentTarget.value);
   };
 

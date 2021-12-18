@@ -12,11 +12,18 @@ import MovieList from '../../components/movie-list/MovieList';
 import VideoPlayer from 'components/videoplayer';
 import Button, { OutlineButton } from 'components/button/Button';
 import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import {
+  selectorUserHistory,
+  updateUserHistory,
+} from 'redux/reducer/userHistory';
 
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
+
+  const userHistory = useAppSelector(selectorUserHistory);
 
   let history = useHistory();
 
@@ -30,22 +37,40 @@ const Detail = () => {
   };
 
   const handleWatchMovieEvent = () => {
-    if (false) {
-      pushToMovie();
+    const isLegalToWatch = CheckIfLegal(userHistory);
+
+    if (isLegalToWatch) {
+      pushToMovie(location.pathname);
     } else {
       setModalVisible();
     }
   };
 
-  const pushToMovie = () => {
-    history.push('/movie/524434/watching');
+  const CheckIfLegal = (user) => {
+    if (user.isBoughtPlan) {
+      return true;
+    }
+
+    const listMovies = user.boughtMovies;
+    if (listMovies.length > 0) {
+      const isMovieBought = listMovies.some((movie) => movie.id === item.id);
+      return isMovieBought;
+    }
+
+    return false;
+  };
+
+  const pushToMovie = (path) => {
+    history.push(`${path}` + '/watching');
   };
 
   const pushToCheckout = () => {
-    history.push({
-      pathname: '/checkout',
-      state: item,
-    });
+    let selectedItem = {
+      isPlan: false,
+      item: item,
+    };
+    localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
+    history.push('/checkout');
   };
 
   useEffect(() => {
@@ -117,15 +142,15 @@ const Detail = () => {
           <Modal active={false} id="PaymentNotification">
             {/* @ts-ignore */}
             <ModalWithButton
-              onOk={pushToCheckout}
-              onAbort={() => {}}
-              okContent="Purchase"
-              abortContent="Later"
+              onOk={() => history.push('/plan')}
+              onAbort={pushToCheckout}
+              okContent="Subscribe a plan"
+              abortContent="Buy movie"
             >
               <div className="flex justify-center items-center text-xl text-center">
                 <div>
-                  You dont have permission to watch this movie. Buy it or
-                  Subscribe a plan
+                  You dont have permission to watch this movie.
+                  <div>Buy it or Subscribe a plan</div>
                 </div>
               </div>
             </ModalWithButton>

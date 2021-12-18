@@ -34,10 +34,13 @@ export default function Plan({}: Props): ReactElement {
   const history = useHistory();
 
   const PushToCheckout = (selectedPlan: FixMeLater) => {
-    history.push({
-      pathname: '/checkout',
-      state: selectedPlan,
-    });
+    let selectedItem = {
+      isPlan: true,
+      item: selectedPlan,
+    };
+
+    localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
+    history.push('/checkout');
   };
 
   return (
