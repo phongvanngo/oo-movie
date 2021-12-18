@@ -92,7 +92,7 @@ export default function Checkout({}: Props): ReactElement {
 
   const pushToMovie = () => {
     //Test route
-    history.push('/movie/568124');
+    history.push(`/${itemPurchasing.MovieOrTv}/${itemPurchasing.item.id}`);
   };
 
   const pushToHome = () => {

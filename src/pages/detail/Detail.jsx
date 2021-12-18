@@ -65,8 +65,13 @@ const Detail = () => {
   };
 
   const pushToCheckout = () => {
+    let MovieOrTV = 'movie';
+    if (item.number_of_episodes) {
+      MovieOrTV = 'tv';
+    }
     let selectedItem = {
       isPlan: false,
+      MovieOrTv: MovieOrTV,
       item: item,
     };
     localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
