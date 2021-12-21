@@ -18,15 +18,13 @@ interface Props {
   //   location: RouteComponentProps;
 }
 
-interface IListPurchasing {
-  name: string;
-  price: number;
+interface IPromotion {
+  code: string;
+  discount: number;
 }
 
 export default function Checkout({}: Props): ReactElement {
   // State luu tru giu lieu khi route khach push vao component nay
-
-  const [listPurchasing, setListPurchasing] = useState<FixMeLater>([]);
   const [itemPurchasing, setItemPurchasing] = useState<FixMeLater>(null);
   const history = useHistory();
   const [cardProps, setCardProps] = useState<ReactCreditCardProps>({
@@ -37,80 +35,102 @@ export default function Checkout({}: Props): ReactElement {
     number: '',
     issuer: '',
   });
+  const [total, setTotal] = useState(0);
+  const [subTotal, setSubTotal] = useState(0);
+  const [promotionState, setPromotionState] = useState<IPromotion>({
+    code: '',
+    discount: 10,
+  });
+  const [promotionInput, setPromotionInput] = useState('');
 
   const userHistory = useAppSelector(selectorUserHistory);
   const dispatch = useAppDispatch();
 
+  //   ======== Component did mout ==============
   useEffect(() => {
     let itemFromStorage = JSON.parse(
       localStorage.getItem('selectedItem') as FixMeLater
     );
 
+    console.log(itemFromStorage);
     setItemPurchasing(itemFromStorage);
-
-    let selectedItem = null;
-    if (itemFromStorage.isPlan) {
-      selectedItem = {
-        name: itemFromStorage.item.title,
-        price: itemFromStorage.item.price,
-      };
-    } else {
-      selectedItem = {
-        name: itemFromStorage.item.title || itemFromStorage.item.name,
-        price: 20,
-      };
-    }
-
-    let listItems = [];
-    listItems.push(selectedItem);
-
-    setListPurchasing(listItems);
+    setTotal(itemFromStorage.item.price);
+    setSubTotal(itemFromStorage.item.price);
   }, []);
-
-  const [promotionState, setPromotionState] = useState<string>('');
+  // +========== End use effect here ==========
 
   const setModalVisible = () => {
     const modal = document.querySelector(`#PaymentNotification`);
     if (modal) {
       modal.classList.toggle('active');
     }
-    HandleLocalStorage();
   };
 
-  // Thay doi local storage khi checkout.
-  const HandleLocalStorage = () => {
+  const onCheckout = () => {
+    setModalVisible();
+    SaveCheckoutData();
+  };
+
+  // =========Thay doi local storage khi checkout.
+  const SaveCheckoutData = () => {
     const newUserHistory = { ...userHistory };
+
+    //======= Save bill ne===
+    const bill = CreateBill();
+    let newListBills = [...newUserHistory.bills];
+    newListBills.unshift(bill);
+    newUserHistory.bills = newListBills;
+
+    // Mua plan thi coi dc het phim
     if (itemPurchasing.isPlan) {
       newUserHistory.isBoughtPlan = true;
     } else {
+      // Mua phim thi them phim vao
       let newListBoughtMovies = [...newUserHistory.boughtMovies];
-      newListBoughtMovies.push(itemPurchasing.item);
+      newListBoughtMovies.unshift(itemPurchasing.item);
       newUserHistory.boughtMovies = newListBoughtMovies;
     }
+
     dispatch(updateUserHistory(newUserHistory));
   };
 
+  const CreateBill = () => {
+    const date = new Date(Date.now());
+    const today = date.toDateString();
+    const billCode = Math.floor(Math.random() * 999) + 100;
+    let bill = {
+      id: billCode,
+      date: today,
+      item: itemPurchasing.item,
+      promotion: promotionState,
+      total: total,
+    };
+    return bill;
+  };
+
   const pushToMovie = () => {
-    //Test route
-    history.push(`/${itemPurchasing.MovieOrTv}/${itemPurchasing.item.id}`);
+    // Neu don hang la phim => chuyen den trang phim
+    if (!itemPurchasing.isPlan) {
+      history.push(`/${itemPurchasing.MovieOrTv}/${itemPurchasing.item.id}`);
+    } else {
+      history.push('/');
+    }
   };
 
   const pushToHome = () => {
     history.push('/');
   };
 
-  const onPromotionChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setPromotionState(e.currentTarget.value);
-  };
-
   const AddPromotion = () => {
-    const promotion: IListPurchasing = {
-      name: promotionState,
-      price: -30,
-    };
-    const newPurchaseList = [...listPurchasing];
-    newPurchaseList.push(promotion);
-    setListPurchasing(newPurchaseList);
+    setPromotionState({
+      ...promotionState,
+      code: promotionInput,
+    });
+
+    const total =
+      itemPurchasing.item.price -
+      itemPurchasing.item.price * (promotionState.discount / 100.0);
+    setTotal(total);
   };
 
   return (
@@ -125,13 +145,21 @@ export default function Checkout({}: Props): ReactElement {
           <div className="font-semibold mb-8">Order Summary</div>
 
           <div className="pb-4" id="purchasing-item">
-            {listPurchasing.length > 0 &&
-              listPurchasing.map((item: FixMeLater, index: FixMeLater) => (
-                <div key={index} className="flex justify-between mb-4 ">
-                  <div>{item.name}</div>
-                  <div>${item.price}</div>
-                </div>
-              ))}
+            <div className="flex justify-between mb-4 ">
+              {itemPurchasing?.item.last_episode_to_air && (
+                <div>{itemPurchasing?.item.name}</div>
+              )}
+              {!itemPurchasing?.item.last_episode_to_air && (
+                <div>{itemPurchasing?.item.title}</div>
+              )}
+              <div>${itemPurchasing?.item.price}</div>
+            </div>
+            {promotionState.code && (
+              <div className="flex justify-between mb-4 ">
+                <div>{promotionState.code}</div>
+                <div>{promotionState.discount}%</div>
+              </div>
+            )}
           </div>
 
           <hr className="mb-4" />
@@ -144,13 +172,11 @@ export default function Checkout({}: Props): ReactElement {
                 type="tel"
                 name="code"
                 placeholder="Promotion code"
-                value={promotionState}
-                onChange={onPromotionChange}
+                value={promotionInput}
+                onChange={(e: any) => setPromotionInput(e.target.value)}
               />
               <div
-                onClick={() => {
-                  AddPromotion();
-                }}
+                onClick={AddPromotion}
                 className="promotion__button promotion__button-small"
               >
                 Use code
@@ -164,17 +190,17 @@ export default function Checkout({}: Props): ReactElement {
           <div className="mb-6">
             <div className="flex justify-between mb-1.5">
               <div>Sub-Total</div>
-              <div>$90</div>
+              <div>${subTotal}</div>
             </div>
 
             <div className="flex justify-between font-semibold text-xl">
               <div>Total</div>
-              <div>$60</div>
+              <div>${total}</div>
             </div>
           </div>
 
           <div
-            onClick={setModalVisible}
+            onClick={onCheckout}
             className="promotion__button promotion__button-big"
           >
             Check out

@@ -48,6 +48,7 @@ export default function LoginPage({}: Props): ReactElement {
         isBoughtPlan: false,
         boughtMovies: [],
         historyMovies: [],
+        bills: [],
       };
       dispatch(updateUserHistory(newUSer));
     }

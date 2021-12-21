@@ -17,10 +17,12 @@ const Header = () => {
 
   const HeaderSignOut = () => {
     SignOut();
-    dispatch(updateUserHistory({}));
+    // dispatch(updateUserHistory({}));
     dispatch(setCurrentUser(null));
     history.push('/');
   };
+
+  console.log('Current user', globalUserState);
 
   const DropDownHeader = () => (
     <div

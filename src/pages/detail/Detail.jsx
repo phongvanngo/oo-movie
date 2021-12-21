@@ -72,7 +72,7 @@ const Detail = () => {
     let selectedItem = {
       isPlan: false,
       MovieOrTv: MovieOrTV,
-      item: item,
+      item: { ...item, price: 50 },
     };
     localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
     history.push('/checkout');
