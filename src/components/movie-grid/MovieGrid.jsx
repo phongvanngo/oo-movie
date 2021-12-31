@@ -1,16 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory, useParams } from 'react-router';
-
-import './movie-grid.scss';
-
-import MovieCard from '../movie-card/MovieCard';
-import Button, { OutlineButton, OutlineButtonToggle } from '../button/Button';
-import Input from '../input/Input';
-
-import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
+import movieApi from 'api/oomovie/movieApi';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { getMovies, selectorMovies } from 'redux/reducer/movieSlice';
-import { SwiperSlide, Swiper } from 'swiper/react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
+import { OutlineButton, OutlineButtonToggle } from '../button/Button';
+import MovieCard from '../movie-card/MovieCard';
+import {
+  addAttributeCategory,
+  clearSelectedCategories,
+  updateDisplayCategories,
+  updateListSelectedCategories,
+} from './HandleCategory';
+import './movie-grid.scss';
+import MovieSearch from './MovieSearch';
+import { mergeTwoArray } from 'utils/helper';
 
 const MovieGrid = (props) => {
   const [items, setItems] = useState([]);
@@ -20,79 +25,19 @@ const MovieGrid = (props) => {
 
   const { keyword } = useParams();
 
-  const dispatch = useAppDispatch();
-  const listMovies = useAppSelector(selectorMovies);
-
   const [categories, setCategories] = useState([]);
 
   const [activeCategories, setActiveCategories] = useState([]);
 
-  //   ======= Get movie from api ========
-  //   useEffect(() => {
-  //     dispatch(getMovies());
-  //     // console.log(listMovies);
-  //   }, [listMovies, dispatch]);
-
-  //   ====== Category de click vao thi filter
-
-  const AddAttributeCategory = (listCategories) => {
-    let newCategories = [];
-    if (listCategories) {
-      newCategories = listCategories.map((cate) => {
-        return {
-          ...cate,
-          is_selected: false,
-        };
-      });
-    }
-    setCategories(newCategories);
-  };
-
-  const UpdateDisplayCategories = (category) => {
-    let newCategories = [...categories];
-    newCategories = newCategories.map((cate) => {
-      if (cate.name === category) {
-        return {
-          ...cate,
-          is_selected: !cate.is_selected,
-        };
-      } else {
-        return {
-          ...cate,
-        };
-      }
-    });
-
-    setCategories(newCategories);
-  };
-
-  const UpdateListSelectedCategories = (category) => {
-    let newActiveCategories = categories.filter(
-      (cate) => cate.is_selected === true
-    );
-    categories.forEach((cate) => {
-      if (cate.name === category) {
-        if (cate.is_selected === false) {
-          newActiveCategories.push(cate);
-        } else {
-          newActiveCategories = newActiveCategories.filter(
-            (cate) => cate.name !== category
-          );
-        }
-      }
-    });
-    setActiveCategories(newActiveCategories);
-  };
-
   //   Trigger khi click vao category item
   const FilterCategory = (selectedCate) => {
-    // Update danh sach category (Inactive va active luon)
-    UpdateDisplayCategories(selectedCate);
-    // Update danh sach category active
-    UpdateListSelectedCategories(selectedCate);
+    // Danh sach nay de hien thi
+    updateDisplayCategories(selectedCate, categories, setCategories);
+    // Danh sach nay de xu ly logic
+    updateListSelectedCategories(selectedCate, categories, setActiveCategories);
   };
 
-  //   Trigger moi khi danh sach category active thay doi
+  //   Trigger moi khi danh sach category active thay doi (items)
   const FilterList = (items) => {
     //   Truong hop khong co category nao dc filter thi chuyen thanh all
     let newListItems = [...items];
@@ -119,31 +64,14 @@ const MovieGrid = (props) => {
     setItems([...items, ...itemsFilterd]);
   };
 
-  //   Trigger khi click All
-  const ClearSelectedCategories = () => {
-    let newCategories = [...categories];
-    newCategories = newCategories.map((cate) => {
-      if (cate.is_selected === true) {
-        return {
-          ...cate,
-          is_selected: !cate.is_selected,
-        };
-      } else {
-        return {
-          ...cate,
-        };
-      }
-    });
-    setActiveCategories([]);
-    setCategories(newCategories);
-  };
-
   useEffect(() => {
     const getList = async () => {
       let responseMovies = null;
       let responseCategories = null;
+      let responseMovieNew = null;
       if (keyword === undefined) {
         const params = {};
+        responseMovieNew = await movieApi.getAll({ params });
         switch (props.category) {
           case category.movie:
             responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
@@ -170,10 +98,14 @@ const MovieGrid = (props) => {
         };
         responseMovies = await tmdbApi.search(props.category, { params });
       }
+      //   console.log('movie test ne', responseMovieFromAws?.data);
+      //   console.log('movie that ne ne', responseMovies.results);
+      //   const listItems = mergeTwoArray(
+      //     responseMovieFromAws?.data,
+      //     responseMovies.results
+      //   );
       setItems(responseMovies.results);
-      //   console.log(responseMovies.results);
-      //   console.log(responseCategories?.genres);
-      AddAttributeCategory(responseCategories?.genres);
+      addAttributeCategory(responseCategories?.genres, setCategories);
       setTotalPage(responseMovies.total_pages);
     };
     getList();
@@ -183,8 +115,9 @@ const MovieGrid = (props) => {
   useEffect(() => {
     const getList = async () => {
       let responseMovies = null;
-
+      let responseMovieFromAws = null;
       const params = {};
+      responseMovieFromAws = await movieApi.getAll({ params });
       switch (props.category) {
         case category.movie:
           responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
@@ -197,6 +130,10 @@ const MovieGrid = (props) => {
             params,
           });
       }
+      //     const listItems = mergeTwoArray(
+      //     responseMovieFromAws?.data,
+      //     responseMovies.results
+      //   );
       FilterList(responseMovies.results);
     };
     getList();
@@ -237,7 +174,13 @@ const MovieGrid = (props) => {
             <Swiper grabCursor={true} slidesPerView={'auto'}>
               <SwiperSlide>
                 <OutlineButtonToggle
-                  onClick={ClearSelectedCategories}
+                  onClick={() =>
+                    clearSelectedCategories(
+                      categories,
+                      setCategories,
+                      setActiveCategories
+                    )
+                  }
                   className="small btn-float-from-left"
                 >
                   All
@@ -271,50 +214,6 @@ const MovieGrid = (props) => {
           </OutlineButton>
         </div>
       ) : null}
-    </>
-  );
-};
-
-// =================== Search component ================
-const MovieSearch = (props) => {
-  const history = useHistory();
-
-  const [keyword, setKeyword] = useState(props.keyword ? props.keyword : '');
-
-  const goToSearch = useCallback(() => {
-    if (keyword.trim().length > 0) {
-      history.push(`/${category[props.category]}/search/${keyword}`);
-    }
-  }, [keyword, props.category, history]);
-
-  useEffect(() => {
-    const enterEvent = (e) => {
-      e.preventDefault();
-      if (e.keyCode === 13) {
-        goToSearch();
-      }
-    };
-    document.addEventListener('keyup', enterEvent);
-    return () => {
-      document.removeEventListener('keyup', enterEvent);
-    };
-  }, [keyword, goToSearch]);
-
-  return (
-    <>
-      <div className="movie-search">
-        <div className="mb-2">
-          <Input
-            type="text"
-            placeholder="Enter keyword"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <Button className="small" onClick={goToSearch}>
-            Search
-          </Button>
-        </div>
-      </div>
     </>
   );
 };

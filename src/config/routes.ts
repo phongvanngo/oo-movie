@@ -146,9 +146,4 @@ export const linkDropDown = [
     name: 'Profile',
     path: '/profile',
   },
-  {
-    id: 2,
-    name: 'Cart',
-    path: '/cart',
-  },
 ];

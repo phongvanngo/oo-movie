@@ -17,11 +17,14 @@ import {
   selectorUserHistory,
   updateUserHistory,
 } from 'redux/reducer/userHistory';
+import movieApi from 'api/oomovie/movieApi';
 
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
+
+  const [movieDetailTest, setMovieDetailTest] = useState(null);
 
   const userHistory = useAppSelector(selectorUserHistory);
 
@@ -82,6 +85,12 @@ const Detail = () => {
     const getDetail = async () => {
       const response = await tmdbApi.detail(category, id, { params: {} });
       setItem(response);
+
+      const testResponse = await movieApi.getMovieDetail({
+        params: { id: '403a6c2b-480e-43fa-bb61-c4b1dcc24950' },
+      });
+      //   setMovieDetailTest(testResponse);
+      console.log(testResponse);
       window.scrollTo(0, 0);
     };
     getDetail();

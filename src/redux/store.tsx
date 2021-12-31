@@ -10,7 +10,7 @@ export const store = configureStore({
     counter: counterReducer,
     authenUser: authenticateReducer,
     loader: loaderReducer,
-    movie: moviesReducer,
+    // movie: moviesReducer,
     userHistory: userHistoryReducer,
   },
 });
