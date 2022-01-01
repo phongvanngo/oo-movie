@@ -19,6 +19,9 @@ import {
 } from 'redux/reducer/userHistory';
 import movieApi from 'api/oomovie/movieApi';
 
+import { MapVariable } from 'utils/MapVariables';
+import { MovieModelMapPattern } from 'interfaces/MovideDetail';
+
 const Detail = () => {
   const { category, id } = useParams();
 
@@ -83,14 +86,16 @@ const Detail = () => {
 
   useEffect(() => {
     const getDetail = async () => {
-      const response = await tmdbApi.detail(category, id, { params: {} });
-      setItem(response);
+      let movieDetail = null;
+      try {
+        let response = await movieApi.getMovieDetail({ params: { id: id } });
+        movieDetail = MapVariable(response.data, MovieModelMapPattern);
+      } catch (error) {
+        movieDetail = await tmdbApi.detail(category, id, { params: {} });
+      }
+      setItem(movieDetail);
 
-      const testResponse = await movieApi.getMovieDetail({
-        params: { id: '403a6c2b-480e-43fa-bb61-c4b1dcc24950' },
-      });
-      //   setMovieDetailTest(testResponse);
-      console.log(testResponse);
+      console.log(movieDetail);
       window.scrollTo(0, 0);
     };
     getDetail();

@@ -1,6 +1,5 @@
 import movieApi from 'api/oomovie/movieApi';
-import { getCatesByMoviesOrTV, getMoviesOrTvSeries } from 'module/movie/movie';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { MergeMovieLists } from 'utils/Movie';
@@ -15,6 +14,7 @@ import { OutlineButton, OutlineButtonToggle } from '../button/Button';
 import MovieCard from '../movie-card/MovieCard';
 import './movie-grid.scss';
 import MovieSearch from './MovieSearch';
+import { MapMoviesByType, SearchMovies } from 'module/movie/handleMovie';
 
 const MovieGrid = (props) => {
   const [items, setItems] = useState([]);
@@ -27,6 +27,8 @@ const MovieGrid = (props) => {
   const [categories, setCategories] = useState([]);
 
   const [activeCategories, setActiveCategories] = useState([]);
+
+  const listItemsToFilter = useRef();
 
   //   Trigger khi click vao category item
   const FilterCategory = (selectedCate) => {
@@ -72,10 +74,12 @@ const MovieGrid = (props) => {
     const getList = async () => {
       let responseMovies = null;
       let responseCategories = null;
-      let responseMovieNew = null;
+      let newMovies = null;
       if (keyword === undefined) {
         const params = {};
-        responseMovieNew = await movieApi.getAll({ params });
+        const reponseNewMovies = await movieApi.getAll({ params });
+        newMovies = reponseNewMovies.data;
+
         switch (props.category) {
           case category.movie:
             responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
@@ -101,13 +105,18 @@ const MovieGrid = (props) => {
           query: keyword,
         };
         responseMovies = await tmdbApi.search(props.category, { params });
-      }
-      const listItems = MergeMovieLists(
-        responseMovies.results,
-        responseMovieNew.data
-      );
 
+        const reponseNewMovies = await movieApi.getAll({ params });
+        newMovies = SearchMovies(reponseNewMovies.data, keyword);
+      }
+
+      newMovies = MapMoviesByType(newMovies, props.category);
+      const listItems = MergeMovieLists(responseMovies.results, newMovies);
       setItems(listItems);
+
+      if (!keyword) {
+        listItemsToFilter.current = listItems;
+      }
 
       addAttributeCategory(responseCategories?.genres, setCategories);
 
@@ -116,33 +125,10 @@ const MovieGrid = (props) => {
     getList();
   }, [props.category, keyword]);
 
-  //   Trigger moi khi active category thay doi => Get list movies moi nhat ve => filter => setState
   useEffect(() => {
-    const getList = async () => {
-      let responseMovies = null;
-      let responseMovieNew = null;
-      const params = {};
-      responseMovieNew = await movieApi.getAll({ params });
-      switch (props.category) {
-        case category.movie:
-          responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
-            params,
-          });
-
-          break;
-        default:
-          responseMovies = await tmdbApi.getTvList(tvType.popular, {
-            params,
-          });
-      }
-
-      const listItems = MergeMovieLists(
-        responseMovies.results,
-        responseMovieNew.data
-      );
-      FilterList(listItems);
-    };
-    getList();
+    if (listItemsToFilter.current) {
+      FilterList(listItemsToFilter.current);
+    }
   }, [activeCategories]);
 
   const loadMore = async () => {
