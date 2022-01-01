@@ -40,20 +40,20 @@ export const updateDisplayCategories = (
 
 // List category nay de xu ly logics
 export const updateListSelectedCategories = (
-  category,
-  categories,
+  selectedCategory,
+  currentCategories,
   handleChangeCategories
 ) => {
-  let newActiveCategories = categories.filter(
+  let newActiveCategories = currentCategories.filter(
     (cate) => cate.is_selected === true
   );
-  categories.forEach((cate) => {
-    if (cate.name === category) {
+  currentCategories.forEach((cate) => {
+    if (cate.name === selectedCategory) {
       if (cate.is_selected === false) {
         newActiveCategories.push(cate);
       } else {
         newActiveCategories = newActiveCategories.filter(
-          (cate) => cate.name !== category
+          (cate) => cate.name !== selectedCategory
         );
       }
     }

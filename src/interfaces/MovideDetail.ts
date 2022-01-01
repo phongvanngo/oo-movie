@@ -68,3 +68,15 @@ export interface ICommentData {
   author?: string;
   comments?: IComment[] | undefined;
 }
+
+export const MovieModelMapPattern = {
+  release_date: 'releaseDate',
+  releaseDate: 'release_date',
+  poster_path: 'posterPath',
+  posterPath: 'poster_path',
+  genres: 'genre_ids',
+  genre_ids: 'genres',
+  original_title: 'originalTitle',
+  originalTitle: 'original_title',
+  back_drop_path: 'backdrop_path',
+};

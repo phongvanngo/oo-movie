@@ -1,21 +1,20 @@
 import movieApi from 'api/oomovie/movieApi';
+import { getCatesByMoviesOrTV, getMoviesOrTvSeries } from 'module/movie/movie';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { getMovies, selectorMovies } from 'redux/reducer/movieSlice';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { MergeMovieLists } from 'utils/Movie';
 import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
-import { OutlineButton, OutlineButtonToggle } from '../button/Button';
-import MovieCard from '../movie-card/MovieCard';
 import {
   addAttributeCategory,
   clearSelectedCategories,
   updateDisplayCategories,
   updateListSelectedCategories,
-} from './HandleCategory';
+} from '../../module/movie/handleCategory';
+import { OutlineButton, OutlineButtonToggle } from '../button/Button';
+import MovieCard from '../movie-card/MovieCard';
 import './movie-grid.scss';
 import MovieSearch from './MovieSearch';
-import { mergeTwoArray } from 'utils/helper';
 
 const MovieGrid = (props) => {
   const [items, setItems] = useState([]);
@@ -47,10 +46,15 @@ const MovieGrid = (props) => {
       newListItems = items.filter((item) => {
         // Voi 1 phim, xet toan bo category dc chon.
         // Doi voi moi category dc chon, select some in movies category.
-        let isContains = false;
-        activeCategories.some((activeCate) => {
-          isContains = item.genre_ids.some((genre) => genre === activeCate.id);
-          return isContains;
+        let isContains = activeCategories.some((activeCate) => {
+          if (item?.isMine) {
+            return item.genre_ids.some((genre) => {
+              const isAlike = genre.name.indexOf(activeCate.name);
+              return genre.name === activeCate.name || isAlike >= 0;
+            });
+          } else {
+            return item.genre_ids.some((genre) => genre === activeCate.id);
+          }
         });
         return isContains;
       });
@@ -98,14 +102,15 @@ const MovieGrid = (props) => {
         };
         responseMovies = await tmdbApi.search(props.category, { params });
       }
-      //   console.log('movie test ne', responseMovieFromAws?.data);
-      //   console.log('movie that ne ne', responseMovies.results);
-      //   const listItems = mergeTwoArray(
-      //     responseMovieFromAws?.data,
-      //     responseMovies.results
-      //   );
-      setItems(responseMovies.results);
+      const listItems = MergeMovieLists(
+        responseMovies.results,
+        responseMovieNew.data
+      );
+
+      setItems(listItems);
+
       addAttributeCategory(responseCategories?.genres, setCategories);
+
       setTotalPage(responseMovies.total_pages);
     };
     getList();
@@ -115,9 +120,9 @@ const MovieGrid = (props) => {
   useEffect(() => {
     const getList = async () => {
       let responseMovies = null;
-      let responseMovieFromAws = null;
+      let responseMovieNew = null;
       const params = {};
-      responseMovieFromAws = await movieApi.getAll({ params });
+      responseMovieNew = await movieApi.getAll({ params });
       switch (props.category) {
         case category.movie:
           responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
@@ -130,11 +135,12 @@ const MovieGrid = (props) => {
             params,
           });
       }
-      //     const listItems = mergeTwoArray(
-      //     responseMovieFromAws?.data,
-      //     responseMovies.results
-      //   );
-      FilterList(responseMovies.results);
+
+      const listItems = MergeMovieLists(
+        responseMovies.results,
+        responseMovieNew.data
+      );
+      FilterList(listItems);
     };
     getList();
   }, [activeCategories]);

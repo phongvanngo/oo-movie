@@ -1,18 +1,15 @@
+import Modal, { ModalWithButton } from 'components/modal/Modal';
 import PageHeader from 'components/page-header/PageHeader';
+import { FixMeLater } from 'interfaces/Migrate';
+import { SaveCheckoutData } from 'module/checkout/checkout';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
-import PaymentCard from './PaymentCard';
-import './checkout.scss';
-import Button from 'components/button/Button';
-import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
-import { RouteComponentProps, useHistory, useLocation } from 'react-router';
-import { FixMeLater } from 'interfaces/Migrate';
+import { useHistory } from 'react-router';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import {
-  selectorUserHistory,
-  updateUserHistory,
-} from 'redux/reducer/userHistory';
+import { selectorUserHistory } from 'redux/reducer/userHistory';
+import './checkout.scss';
+import PaymentCard from './PaymentCard';
 
 interface Props {
   //   location: RouteComponentProps;
@@ -66,47 +63,20 @@ export default function Checkout({}: Props): ReactElement {
     }
   };
 
+  const validateCard = () => {};
+
   const onCheckout = () => {
     setModalVisible();
-    SaveCheckoutData();
+    SaveCheckoutData(
+      userHistory,
+      itemPurchasing,
+      promotionState,
+      total,
+      dispatch
+    );
   };
 
   // =========Thay doi local storage khi checkout.
-  const SaveCheckoutData = () => {
-    const newUserHistory = { ...userHistory };
-
-    //======= Save bill ne===
-    const bill = CreateBill();
-    let newListBills = [...newUserHistory.bills];
-    newListBills.unshift(bill);
-    newUserHistory.bills = newListBills;
-
-    // Mua plan thi coi dc het phim
-    if (itemPurchasing.isPlan) {
-      newUserHistory.isBoughtPlan = true;
-    } else {
-      // Mua phim thi them phim vao
-      let newListBoughtMovies = [...newUserHistory.boughtMovies];
-      newListBoughtMovies.unshift(itemPurchasing.item);
-      newUserHistory.boughtMovies = newListBoughtMovies;
-    }
-
-    dispatch(updateUserHistory(newUserHistory));
-  };
-
-  const CreateBill = () => {
-    const date = new Date(Date.now());
-    const today = date.toDateString();
-    const billCode = Math.floor(Math.random() * 999) + 100;
-    let bill = {
-      id: billCode,
-      date: today,
-      item: itemPurchasing.item,
-      promotion: promotionState,
-      total: total,
-    };
-    return bill;
-  };
 
   const pushToMovie = () => {
     // Neu don hang la phim => chuyen den trang phim
