@@ -70,7 +70,24 @@ export default function Theater({}: Props): ReactElement {
 
   const [movieLink, setMovieLink] = useState<FixMeLater>(null);
 
-  // let hisrory = useHistory();
+  const getDownloadLink = async (episodeObj: FixMeLater) => {
+    const contentLink = episodeObj.content;
+
+    try {
+      const responseList = await movieApi.getDownloadLink({
+        params: { path: contentLink },
+      });
+      const data = responseList!.data;
+      setMovieLink(data);
+      //   console.log(data);
+    } catch (error) {}
+    window.scrollTo(0, 0);
+  };
+
+  const getEpisodeByName = (data: FixMeLater) => {
+    const currentEps = data.find((eps: FixMeLater) => eps.name === episode);
+    return currentEps;
+  };
 
   useEffect(() => {
     const getEpisodes = async () => {
@@ -92,27 +109,17 @@ export default function Theater({}: Props): ReactElement {
             search: `?episode=${firstMovie.name}`,
           });
         } else {
-          const currentEps = data.find(
-            (eps: FixMeLater) => (eps.name = episode)
-          );
+          const currentEps = getEpisodeByName(data);
+
           setCurrentEpisodeObject(currentEps);
           getDownloadLink(currentEps);
         }
       } catch (error) {}
     };
+    getEpisodes();
+  }, []);
 
-    const getDownloadLink = async (episodeObj: FixMeLater) => {
-      const contentLink = episodeObj.content;
-      try {
-        const responseList = await movieApi.getDownloadLink({
-          params: { path: contentLink },
-        });
-        const data = responseList!.data;
-        setMovieLink(data);
-        console.log(data);
-      } catch (error) {}
-    };
-
+  useEffect(() => {
     const getDetail = async () => {
       let movieDetail = null;
       try {
@@ -127,9 +134,18 @@ export default function Theater({}: Props): ReactElement {
 
       window.scrollTo(0, 0);
     };
-    getEpisodes();
     getDetail();
-  }, [category, id, episode, history, location.pathname]);
+  }, [category, id]);
+
+  useEffect(() => {
+    if (listEpisodes) {
+      const currentEps = getEpisodeByName(listEpisodes);
+
+      setCurrentEpisodeObject(currentEps);
+
+      getDownloadLink(currentEps);
+    }
+  }, [episode]);
 
   return (
     <div>
@@ -166,7 +182,7 @@ export default function Theater({}: Props): ReactElement {
             </div>
             <div className="mb-10">
               <div className="mb-4">You may also like</div>
-              <MovieList category={category} type="similar" id={item.id} />
+              {/* <MovieList category={category} type="similar" id={item.id} /> */}
             </div>
           </div>
         </>

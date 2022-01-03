@@ -22,8 +22,6 @@ const Header = () => {
     history.push('/');
   };
 
-  console.log('Current user', globalUserState);
-
   const DropDownHeader = () => (
     <div
       className={`header__dropdown border border-black border-opacity-60 drop-shadow-2xl w-full absolute rounded-md `}

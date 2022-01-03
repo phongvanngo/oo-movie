@@ -3,7 +3,7 @@ import { RouterParams } from 'interfaces/Route';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import Chappter from './Chappter';
-
+import queryString from 'query-string';
 interface Props {
   chappters: Ichappter[];
   selectedChappter?: FixMeLater;
@@ -23,28 +23,29 @@ export default function MovieChappers({
   selectedChappter,
 }: Props): ReactElement {
   const location = useLocation();
+  const value = queryString.parse(location.search);
+  const episode = value.episode;
+
+  useEffect(() => {
+    // console.log('rerender', selectedChappter);
+    console.log(chappters);
+  }, [selectedChappter, chappters]);
 
   return (
     <>
       <div className="chappter__container">
         {chappters &&
-          selectedChappter &&
           chappters.map((chappter, index) => {
             const link = `${location.pathname}?episode=${chappter.name}`;
-
-            if (chappter.name === selectedChappter?.name) {
-              return (
-                <Chappter link={link} key={index} isActive>
-                  {chappter.ordinal}
-                </Chappter>
-              );
-            } else {
-              return (
-                <Chappter link={link} key={index}>
-                  {chappter.ordinal}
-                </Chappter>
-              );
-            }
+            return (
+              <Chappter
+                link={link}
+                key={index}
+                isActive={chappter.id === selectedChappter?.id}
+              >
+                {chappter.ordinal}
+              </Chappter>
+            );
           })}
       </div>
     </>
