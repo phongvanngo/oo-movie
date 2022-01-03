@@ -2,19 +2,18 @@ import movieApi from 'api/oomovie/movieApi';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { MergeMovieLists } from 'utils/Movie';
+import { mergeMovieLists } from 'utils/Movie';
 import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
-import {
-  addAttributeCategory,
-  clearSelectedCategories,
-  updateDisplayCategories,
-  updateListSelectedCategories,
-} from '../../module/movie/handleCategory';
 import { OutlineButton, OutlineButtonToggle } from '../button/Button';
 import MovieCard from '../movie-card/MovieCard';
 import './movie-grid.scss';
 import MovieSearch from './MovieSearch';
-import { MapMoviesByType, SearchMovies } from 'module/movie/handleMovie';
+import { mapMoviesByType, searchMovies } from 'utils/Movie';
+import {
+  addAttributeCategory,
+  updateDisplayCategories,
+  clearSelectedCategories,
+} from 'utils/Category';
 
 const MovieGrid = (props) => {
   const [items, setItems] = useState([]);
@@ -32,10 +31,13 @@ const MovieGrid = (props) => {
 
   //   Trigger khi click vao category item
   const FilterCategory = (selectedCate) => {
-    // Danh sach nay de hien thi
-    updateDisplayCategories(selectedCate, categories, setCategories);
-    // Danh sach nay de xu ly logic
-    updateListSelectedCategories(selectedCate, categories, setActiveCategories);
+    // 1 danh sach de hien thi. 1 danh sach de xu ly logic
+    updateDisplayCategories(
+      selectedCate,
+      categories,
+      setCategories,
+      setActiveCategories
+    );
   };
 
   //   Trigger moi khi danh sach category active thay doi (items)
@@ -107,11 +109,13 @@ const MovieGrid = (props) => {
         responseMovies = await tmdbApi.search(props.category, { params });
 
         const reponseNewMovies = await movieApi.getAll({ params });
-        newMovies = SearchMovies(reponseNewMovies.data, keyword);
+        newMovies = searchMovies(reponseNewMovies.data, keyword);
       }
 
-      newMovies = MapMoviesByType(newMovies, props.category);
-      const listItems = MergeMovieLists(responseMovies.results, newMovies);
+      newMovies = mapMoviesByType(newMovies, props.category);
+
+      const listItems = mergeMovieLists(responseMovies.results, newMovies);
+
       setItems(listItems);
 
       if (!keyword) {

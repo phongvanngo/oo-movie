@@ -1,26 +1,18 @@
+import movieApi from 'api/oomovie/movieApi';
+import Button, { OutlineButton } from 'components/button/Button';
+import Modal, { ModalWithButton } from 'components/modal/Modal';
+import { MovieModelMapPattern } from 'interfaces/MovideDetail';
 import React, { useEffect, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
-
-import tmdbApi from '../../api/tmdbApi';
-import apiConfig from '../../api/apiConfig';
-
-import './detail.scss';
-import CastList from './CastList';
-import VideoList from './VideoList';
-
-import MovieList from '../../components/movie-list/MovieList';
-import VideoPlayer from 'components/videoplayer';
-import Button, { OutlineButton } from 'components/button/Button';
-import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import {
-  selectorUserHistory,
-  updateUserHistory,
-} from 'redux/reducer/userHistory';
-import movieApi from 'api/oomovie/movieApi';
-
+import { useAppSelector } from 'redux/hooks';
+import { selectorUserHistory } from 'redux/reducer/userHistory';
 import { MapVariable } from 'utils/MapVariables';
-import { MovieModelMapPattern } from 'interfaces/MovideDetail';
+import apiConfig from '../../api/apiConfig';
+import tmdbApi from '../../api/tmdbApi';
+import MovieList from '../../components/movie-list/MovieList';
+import CastList from './CastList';
+import './detail.scss';
+import VideoList from './VideoList';
 
 const Detail = () => {
   const { category, id } = useParams();
@@ -67,7 +59,7 @@ const Detail = () => {
   };
 
   const pushToMovie = (path) => {
-    history.push(`${path}` + '/watching');
+    history.push({ pathname: `${path}/watch`, search: '?episode=' });
   };
 
   const pushToCheckout = () => {
@@ -95,7 +87,7 @@ const Detail = () => {
       }
       setItem(movieDetail);
 
-      console.log(movieDetail);
+      console.log('movie detail ne', movieDetail);
       window.scrollTo(0, 0);
     };
     getDetail();

@@ -11,6 +11,16 @@ const movieApi = {
     const url = 'movie';
     return axiosClient.get(url, params);
   },
+
+  getListEpisodes: (params) => {
+    const url = 'episodes';
+    return axiosClient.get(url, params);
+  },
+
+  getDownloadLink: (params) => {
+    const url = 'download';
+    return axiosClient.get(url, params);
+  },
 };
 
 export default movieApi;

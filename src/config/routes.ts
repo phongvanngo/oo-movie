@@ -78,7 +78,7 @@ const routes: IRoute[] = [
     protected: true,
   },
   {
-    path: '/:category/:id/watching',
+    path: '/:category/:id/watch',
     exact: false,
     component: Theater,
     isProfile: false,

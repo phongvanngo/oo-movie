@@ -1,21 +1,24 @@
-import tmdbApi from 'api/tmdbApi';
-import VideoPlayer from 'components/videoplayer';
-import React, { ReactElement, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { IComment, MovieDetail } from 'interfaces/MovideDetail';
-import { FixMeLater } from 'interfaces/Migrate';
 import apiConfig from 'api/apiConfig';
-import MovieList from 'components/movie-list/MovieList';
-import './theater.scss';
-import MovieChappers from 'components/movie-chappers/MovieChappers';
+import movieApi from 'api/oomovie/movieApi';
+import tmdbApi from 'api/tmdbApi';
 import Comments from 'components/comments';
-import { Helmet } from 'react-helmet';
+import MovieChappers from 'components/movie-chappers/MovieChappers';
+import MovieList from 'components/movie-list/MovieList';
+import VideoPlayer from 'components/videoplayer';
+import { FixMeLater } from 'interfaces/Migrate';
+import { IComment, MovieModelMapPattern } from 'interfaces/MovideDetail';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { useParams, useLocation, useHistory } from 'react-router';
+import { MapVariable } from 'utils/MapVariables';
+import './theater.scss';
+import queryString from 'query-string';
 
 interface Props {}
 
 type RouterParams = {
   category: string;
   id: string;
+  episode: string;
 };
 
 const videoJsOptions = {
@@ -52,25 +55,81 @@ const commentData: IComment[] = [
 export default function Theater({}: Props): ReactElement {
   const { category, id } = useParams<RouterParams>();
 
-  const [item, setItem] = useState<MovieDetail | null>(null);
+  const location = useLocation();
+  const value = queryString.parse(location.search);
+  const episode = value.episode;
+
+  const history = useHistory();
+
+  const [item, setItem] = useState<FixMeLater>(null);
+
+  const [listEpisodes, setListEpisodes] = useState<FixMeLater>(null);
+
+  const [currentEpisodeObject, setCurrentEpisodeObject] =
+    useState<FixMeLater>(null);
+
+  const [movieLink, setMovieLink] = useState<FixMeLater>(null);
 
   // let hisrory = useHistory();
 
-  // const location = useLocation();
-
   useEffect(() => {
-    document.title = 'Theater';
+    const getEpisodes = async () => {
+      let responseList = null;
+      try {
+        responseList = await movieApi.getListEpisodes({
+          params: { movieId: id },
+        });
+        const data: FixMeLater = responseList!.data;
+        setListEpisodes(data);
+        if (!episode) {
+          const firstMovie: any = data[0];
+
+          setCurrentEpisodeObject(firstMovie);
+          getDownloadLink(firstMovie);
+
+          history.replace({
+            pathname: location.pathname,
+            search: `?episode=${firstMovie.name}`,
+          });
+        } else {
+          const currentEps = data.find(
+            (eps: FixMeLater) => (eps.name = episode)
+          );
+          setCurrentEpisodeObject(currentEps);
+          getDownloadLink(currentEps);
+        }
+      } catch (error) {}
+    };
+
+    const getDownloadLink = async (episodeObj: FixMeLater) => {
+      const contentLink = episodeObj.content;
+      try {
+        const responseList = await movieApi.getDownloadLink({
+          params: { path: contentLink },
+        });
+        const data = responseList!.data;
+        setMovieLink(data);
+        console.log(data);
+      } catch (error) {}
+    };
 
     const getDetail = async () => {
-      const response: FixMeLater = await tmdbApi.detail(category, id, {
-        params: {},
-      });
-      setItem(response);
-      // console.log(response.data);
+      let movieDetail = null;
+      try {
+        let response: FixMeLater = await movieApi.getMovieDetail({
+          params: { id: id },
+        });
+        movieDetail = MapVariable(response.data, MovieModelMapPattern);
+      } catch (error) {
+        movieDetail = await tmdbApi.detail(category, id, { params: {} });
+      }
+      setItem(movieDetail);
+
       window.scrollTo(0, 0);
     };
+    getEpisodes();
     getDetail();
-  }, [category, id]);
+  }, [category, id, episode, history, location.pathname]);
 
   return (
     <div>
@@ -93,7 +152,10 @@ export default function Theater({}: Props): ReactElement {
               <div className="w-3/4">
                 <div className="mb-10">
                   <div className="mb-4 text-lg">Chapters</div>
-                  <MovieChappers />
+                  <MovieChappers
+                    chappters={listEpisodes}
+                    selectedChappter={currentEpisodeObject}
+                  />
                 </div>
                 <div className="pr-6">
                   <div className="mb-4 text-lg">Comments</div>

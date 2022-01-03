@@ -6,3 +6,9 @@ export default interface IRoute {
   isProfile: boolean;
   protected: boolean; // This will defines if the route is proteted or not
 }
+
+export type RouterParams = {
+  category: string;
+  id: string;
+  episode: string;
+};

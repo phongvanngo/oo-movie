@@ -1,5 +1,5 @@
 import React, { ReactChild, ReactChildren, ReactElement } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import './chappter.scss';
 
 interface Props {
@@ -9,14 +9,15 @@ interface Props {
 }
 
 export default function Chappter(props: Props): ReactElement {
+  const history = useHistory();
   return (
     <>
-      <Link
-        to={props.link}
+      <div
+        onClick={() => history.push(props.link)}
         className={`chappter ${props.isActive && 'chappter-active'}`}
       >
         <span className="noselect">{props.children}</span>
-      </Link>
+      </div>
     </>
   );
 }

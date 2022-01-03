@@ -1,11 +1,14 @@
+import { FixMeLater } from 'interfaces/Migrate';
+import { Category } from 'interfaces/Category';
+
 // Them attribute is selected de xac dinh cac category dc selected
 export const addAttributeCategory = (
-  listCategories,
-  handleChangeCategories
+  listCategories: Category[],
+  handleChangeCategories: React.Dispatch<React.SetStateAction<Category[]>>
 ) => {
   let newCategories = [];
   if (listCategories) {
-    newCategories = listCategories.map((cate) => {
+    newCategories = listCategories.map((cate: FixMeLater) => {
       return {
         ...cate,
         is_selected: false,
@@ -17,9 +20,10 @@ export const addAttributeCategory = (
 
 // Danh sach nay dung de hien thi
 export const updateDisplayCategories = (
-  selectedCate,
-  currentCategories,
-  handleChangeCategories
+  selectedCate: string,
+  currentCategories: Category[],
+  handleChangeCategories: React.Dispatch<React.SetStateAction<Category[]>>,
+  handleChangeActiveCategories: React.Dispatch<React.SetStateAction<Category[]>>
 ) => {
   let newCategories = [...currentCategories];
   newCategories = newCategories.map((cate) => {
@@ -36,36 +40,18 @@ export const updateDisplayCategories = (
   });
 
   handleChangeCategories(newCategories);
-};
 
-// List category nay de xu ly logics
-export const updateListSelectedCategories = (
-  selectedCategory,
-  currentCategories,
-  handleChangeCategories
-) => {
-  let newActiveCategories = currentCategories.filter(
+  let newActiveCategories = newCategories.filter(
     (cate) => cate.is_selected === true
   );
-  currentCategories.forEach((cate) => {
-    if (cate.name === selectedCategory) {
-      if (cate.is_selected === false) {
-        newActiveCategories.push(cate);
-      } else {
-        newActiveCategories = newActiveCategories.filter(
-          (cate) => cate.name !== selectedCategory
-        );
-      }
-    }
-  });
-  handleChangeCategories(newActiveCategories);
+  handleChangeActiveCategories(newActiveCategories);
 };
 
 //   Trigger khi click All
 export const clearSelectedCategories = (
-  currentCategories,
-  setCategories,
-  setActiveCategories
+  currentCategories: Category[],
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>,
+  setActiveCategories: React.Dispatch<React.SetStateAction<Category[]>>
 ) => {
   let newCategories = [...currentCategories];
   newCategories = newCategories.map((cate) => {
