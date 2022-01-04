@@ -10,6 +10,8 @@ import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUserHistory } from 'redux/reducer/userHistory';
 import './checkout.scss';
 import PaymentCard from './PaymentCard';
+import LoadingOverlay from 'react-loading-overlay-ts';
+import { selectorLoader, setLoading } from 'redux/reducer/loader';
 
 interface Props {
   //   location: RouteComponentProps;
@@ -40,6 +42,7 @@ export default function Checkout({}: Props): ReactElement {
   });
   const [promotionInput, setPromotionInput] = useState('');
 
+  const loading = useAppSelector(selectorLoader);
   const userHistory = useAppSelector(selectorUserHistory);
   const dispatch = useAppDispatch();
 
@@ -66,7 +69,6 @@ export default function Checkout({}: Props): ReactElement {
   const validateCard = () => {};
 
   const onCheckout = () => {
-    setModalVisible();
     SaveCheckoutData(
       userHistory,
       itemPurchasing,
@@ -74,6 +76,12 @@ export default function Checkout({}: Props): ReactElement {
       total,
       dispatch
     );
+
+    dispatch(setLoading(true));
+    setTimeout(() => {
+      setModalVisible();
+      dispatch(setLoading(false));
+    }, 4000);
   };
 
   // =========Thay doi local storage khi checkout.

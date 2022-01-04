@@ -5,7 +5,7 @@ import type { RootState } from '../store';
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 
 const initialState: any = {
-  value: false,
+  value: true,
 };
 
 export const loaderSlice = createSlice({

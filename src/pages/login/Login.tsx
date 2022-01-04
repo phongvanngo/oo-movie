@@ -11,6 +11,7 @@ import { SignInWithSocialMedia } from '../../module/auth';
 import './login.scss';
 import { FixMeLater } from 'interfaces/Migrate';
 import { updateUserHistory } from 'redux/reducer/userHistory';
+import commonApi from 'api/oomovie/commonApi';
 interface Props {}
 
 export default function LoginPage({}: Props): ReactElement {
@@ -19,13 +20,41 @@ export default function LoginPage({}: Props): ReactElement {
 
   const dispatch = useAppDispatch();
 
+  const registerAndSignIn = async (data: FixMeLater) => {
+    let response = null;
+    try {
+      response = await commonApi.register(data);
+    } catch (error) {
+      try {
+        response = await commonApi.login(data);
+      } catch (error) {
+        console.log('erorr', error);
+      }
+    }
+    saveToken(response?.data);
+  };
+
+  const saveToken = (data: FixMeLater) => {
+    if (data && data?.access_token) {
+      localStorage.setItem('ootoken', data?.access_token);
+    }
+  };
+
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== '') setError('');
 
     SignInWithSocialMedia(provider)
       .then((result) => {
         history.push('/');
-        const user = result.user?.toJSON();
+        const user: any = result.user?.toJSON();
+        //Goi dang nhap => Luu token
+        const data = {
+          username: user!.uid,
+          password: '12345678',
+        };
+
+        registerAndSignIn(data);
+
         dispatch(setCurrentUser(user));
         LocalStorageHandle(user);
       })

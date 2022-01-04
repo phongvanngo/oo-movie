@@ -9,7 +9,14 @@ const axiosClient = axios.create({
   paramsSerializer: (params) => queryString.stringify(params),
 });
 
-axiosClient.interceptors.request.use(async (config) => config);
+axiosClient.interceptors.request.use(async (config) => {
+  const token = localStorage.getItem('oomovietoken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 axiosClient.interceptors.response.use(
   (response) => {

@@ -13,10 +13,10 @@ import Footer from './components/footer/Footer';
 import Header from './components/header/Header';
 import { auth } from './config/firebase';
 import routes from './config/routes';
+import LoadingOverlay from 'react-loading-overlay-ts';
 
 function App() {
-  const [loading, setLoading] = useState(true);
-  //   const loading = useAppSelector(selectorLoader);
+  const loading = useAppSelector(selectorLoader);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -33,43 +33,46 @@ function App() {
       } else {
         console.log('No user detected');
       }
-      //   dispatch(setLoading(false));
-      setLoading(false);
+      dispatch(setLoading(false));
     });
   }, []);
-
-  if (loading) return <div>Loding...</div>;
 
   return (
     <Router>
       <Header />
-      <Switch>
-        {routes.map((route, index) => {
-          if (route.protected) {
-            if (route.isProfile) {
+      <LoadingOverlay active={loading} spinner text="Please wait...">
+        <Switch>
+          {routes.map((route, index) => {
+            if (route.protected) {
+              if (route.isProfile) {
+                return (
+                  <PrivateRoute
+                    key={index}
+                    path={route.path}
+                    layout={ProfileLayout}
+                    component={route.component}
+                  />
+                );
+              }
               return (
                 <PrivateRoute
                   key={index}
                   path={route.path}
-                  layout={ProfileLayout}
                   component={route.component}
                 />
               );
             }
             return (
-              <PrivateRoute
+              <Route
                 key={index}
                 path={route.path}
                 component={route.component}
               />
             );
-          }
-          return (
-            <Route key={index} path={route.path} component={route.component} />
-          );
-        })}
-        ;
-      </Switch>
+          })}
+          ;
+        </Switch>
+      </LoadingOverlay>
       <Footer />
     </Router>
   );
