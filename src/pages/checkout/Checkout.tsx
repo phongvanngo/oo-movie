@@ -5,17 +5,24 @@ import { SaveCheckoutData } from 'module/checkout/checkout';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { setLoading } from 'redux/reducer/loader';
 import { selectorUserHistory } from 'redux/reducer/userHistory';
 import './checkout.scss';
 import PaymentCard from './PaymentCard';
-import LoadingOverlay from 'react-loading-overlay-ts';
-import { selectorLoader, setLoading } from 'redux/reducer/loader';
 
 interface Props {
   //   location: RouteComponentProps;
 }
+
+type Inputs = {
+  name: string;
+  expiry: string;
+  cvc: string;
+  number: string;
+};
 
 interface IPromotion {
   code: string;
@@ -42,9 +49,25 @@ export default function Checkout({}: Props): ReactElement {
   });
   const [promotionInput, setPromotionInput] = useState('');
 
-  const loading = useAppSelector(selectorLoader);
   const userHistory = useAppSelector(selectorUserHistory);
   const dispatch = useAppDispatch();
+
+  const form = useForm<Inputs>();
+
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    SaveCheckoutData(
+      userHistory,
+      itemPurchasing,
+      promotionState,
+      total,
+      dispatch
+    );
+    dispatch(setLoading(true));
+    setTimeout(() => {
+      setModalVisible();
+      dispatch(setLoading(false));
+    }, 4000);
+  };
 
   //   ======== Component did mout ==============
   useEffect(() => {
@@ -66,22 +89,8 @@ export default function Checkout({}: Props): ReactElement {
     }
   };
 
-  const validateCard = () => {};
-
   const onCheckout = () => {
-    SaveCheckoutData(
-      userHistory,
-      itemPurchasing,
-      promotionState,
-      total,
-      dispatch
-    );
-
-    dispatch(setLoading(true));
-    setTimeout(() => {
-      setModalVisible();
-      dispatch(setLoading(false));
-    }, 4000);
+    form.handleSubmit(onSubmit)();
   };
 
   // =========Thay doi local storage khi checkout.
@@ -117,7 +126,11 @@ export default function Checkout({}: Props): ReactElement {
       <div className="flex payment__wrapper">
         <div className="w-3/5 flex flex-col payment__information">
           <div className="font-semibold mb-8">Payment Information</div>
-          <PaymentCard cardProps={cardProps} setCardProps={setCardProps} />
+          <PaymentCard
+            cardProps={cardProps}
+            setCardProps={setCardProps}
+            form={form}
+          />
         </div>
         <div className="w-2/5 payment__items ">
           <div className="font-semibold mb-8">Order Summary</div>
