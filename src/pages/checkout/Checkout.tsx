@@ -1,7 +1,13 @@
+import ErrorValidation from 'components/errorvalidation/ErrorValidation';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
 import PageHeader from 'components/page-header/PageHeader';
+import { DiscountInitialValue, IDiscount } from 'interfaces/Discount';
 import { FixMeLater } from 'interfaces/Migrate';
-import { SaveCheckoutData } from 'module/checkout/checkout';
+import {
+  checkDiscountCode,
+  SaveCheckoutData,
+  UseDiscountCode,
+} from 'module/checkout/checkout';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
@@ -43,11 +49,10 @@ export default function Checkout({}: Props): ReactElement {
   });
   const [total, setTotal] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
-  const [promotionState, setPromotionState] = useState<IPromotion>({
-    code: '',
-    discount: 10,
-  });
+  const [promotionState, setPromotionState] =
+    useState<IDiscount>(DiscountInitialValue);
   const [promotionInput, setPromotionInput] = useState('');
+  const [isValidCode, setIsValidCode] = useState(true);
 
   const userHistory = useAppSelector(selectorUserHistory);
   const dispatch = useAppDispatch();
@@ -62,7 +67,12 @@ export default function Checkout({}: Props): ReactElement {
       total,
       dispatch
     );
+
     dispatch(setLoading(true));
+    if (promotionState.remaining_amount > 0) {
+      UseDiscountCode(promotionState.id);
+    }
+
     setTimeout(() => {
       setModalVisible();
       dispatch(setLoading(false));
@@ -108,16 +118,19 @@ export default function Checkout({}: Props): ReactElement {
     history.push('/');
   };
 
-  const AddPromotion = () => {
-    setPromotionState({
-      ...promotionState,
-      code: promotionInput,
-    });
-
-    const total =
-      itemPurchasing.item.price -
-      itemPurchasing.item.price * (promotionState.discount / 100.0);
-    setTotal(total);
+  const addPromotion = () => {
+    checkDiscountCode(promotionInput)
+      .then((data) => {
+        setIsValidCode(true);
+        setPromotionState(data);
+        const total =
+          itemPurchasing.item.price -
+          itemPurchasing.item.price * (data.value / 100.0);
+        setTotal(total);
+      })
+      .catch(() => {
+        setIsValidCode(false);
+      });
   };
 
   return (
@@ -148,7 +161,7 @@ export default function Checkout({}: Props): ReactElement {
             {promotionState.code && (
               <div className="flex justify-between mb-4 ">
                 <div>{promotionState.code}</div>
-                <div>{promotionState.discount}%</div>
+                <div>-{promotionState.value}%</div>
               </div>
             )}
           </div>
@@ -167,12 +180,13 @@ export default function Checkout({}: Props): ReactElement {
                 onChange={(e: any) => setPromotionInput(e.target.value)}
               />
               <div
-                onClick={AddPromotion}
+                onClick={addPromotion}
                 className="promotion__button promotion__button-small"
               >
                 Use code
               </div>
             </div>
+            {!isValidCode && <ErrorValidation>Invalid Code</ErrorValidation>}
           </div>
 
           <hr className="mb-4" />

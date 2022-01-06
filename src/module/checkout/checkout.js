@@ -1,3 +1,5 @@
+import axiosClient from 'api/oomovie/axiosClientNew';
+import discountApi from 'api/oomovie/discountApi';
 import { updateUserHistory } from 'redux/reducer/userHistory';
 
 export const CreateBill = (itemPurchasing, promotionState, total) => {
@@ -41,4 +43,22 @@ export const SaveCheckoutData = (
   }
 
   dispatch(updateUserHistory(newUserHistory));
+};
+
+export const checkDiscountCode = async (code) => {
+  try {
+    const response = await discountApi.getDiscountByCode({ code: code });
+    return Promise.resolve(response.data);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+export const UseDiscountCode = async (id) => {
+  try {
+    const response = await discountApi.useDiscount({ id: id });
+    return Promise.resolve(response);
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };

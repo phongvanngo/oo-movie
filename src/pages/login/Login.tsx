@@ -26,6 +26,8 @@ export default function LoginPage({}: Props): ReactElement {
       response = await commonApi.register(data);
     } catch (error) {
       try {
+        const logindata = { ...data };
+        delete logindata.role;
         response = await commonApi.login(data);
       } catch (error) {
         console.log('erorr', error);
@@ -51,6 +53,7 @@ export default function LoginPage({}: Props): ReactElement {
         const data = {
           username: user!.uid,
           password: '12345678',
+          role: 'Subscriber',
         };
 
         registerAndSignIn(data);
