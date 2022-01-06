@@ -11,7 +11,7 @@ const HistoryCard = (props: FixMeLater): ReactElement => {
     <div className="p-4  bg-white rounded-2xl text-black mb-5">
       <div className="flex items-center mb-1.5">
         <div className="mr-3">#{props.infor.id}</div>
-        <div className="mr-3">Payment Compleyed</div>
+        <div className="mr-3">Payment Completed</div>
         <div className="opacity-80 text-sm mr-3">{props.infor.date}</div>
       </div>
       <div className="flex w-1/2">
@@ -24,7 +24,7 @@ const HistoryCard = (props: FixMeLater): ReactElement => {
         <div className="flex w-1/2">
           <div className="mr-4">Discount:</div>
 
-          <div className="mr-4">{props.infor?.promotion.code}</div>
+          <div className="mr-4">{props.infor?.promotion.value}</div>
 
           <div>{props.infor?.promotion.discount}%</div>
         </div>

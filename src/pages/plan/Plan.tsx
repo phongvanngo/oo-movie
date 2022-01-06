@@ -1,39 +1,31 @@
 import PlanCard from 'components/plan/PlanCard';
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, {
+  MouseEventHandler,
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import PageHeader from '../../components/page-header/PageHeader';
 import { useHistory } from 'react-router-dom';
 import { FixMeLater } from 'interfaces/Migrate';
+import planApi from 'api/oomovie/planApi';
+import { IPLan } from 'interfaces/Plan';
+import { useAppDispatch } from 'redux/hooks';
+import { setLoading } from 'redux/reducer/loader';
 
 interface Props {}
 
 const SCROLL_TOP_LOCATION = 80;
 
-const listPlans = [
-  {
-    id: 0,
-    title: 'Christmas Plan',
-    price: 30,
-  },
-  {
-    id: 1,
-    title: 'All Year Plan',
-    price: 80,
-  },
-  {
-    id: 2,
-    title: 'Trail Plan',
-    price: 20,
-  },
-];
-
 export default function Plan({}: Props): ReactElement {
-  useEffect(() => {
-    window.scrollTo({ top: SCROLL_TOP_LOCATION, behavior: 'smooth' });
-  }, []);
-
   const history = useHistory();
 
-  const PushToCheckout = (selectedPlan: FixMeLater) => {
+  const [listPlans, setListPlans] = useState<IPLan[] | null>(null);
+
+  const dispatch = useAppDispatch();
+
+  const PushToCheckout = (selectedPlan: IPLan) => {
     let selectedItem = {
       isPlan: true,
       item: selectedPlan,
@@ -41,7 +33,34 @@ export default function Plan({}: Props): ReactElement {
 
     localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
     history.push('/checkout');
+    return;
   };
+
+  const addCustomTitle = (list: IPLan[]) => {
+    const listTitles = ['Chirstmas Plan', 'All Year Plan', 'Trail Plan'];
+    const newList = list.map((item, index) => {
+      return {
+        ...item,
+        custom_title: listTitles[index],
+      };
+    });
+    return newList;
+  };
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const getPLans = async () => {
+      try {
+        const response = await planApi.getAllPlans();
+        const addAttribute = addCustomTitle(response.data);
+        setListPlans(addAttribute);
+      } catch (error) {}
+    };
+    getPLans().finally(() => {
+      dispatch(setLoading(false));
+    });
+    window.scrollTo({ top: SCROLL_TOP_LOCATION, behavior: 'smooth' });
+  }, []);
 
   return (
     <>
@@ -52,23 +71,14 @@ export default function Plan({}: Props): ReactElement {
             Choose your appropriate plan for you
           </div>
           <div className="md:grid grid-cols-3 gap-10">
-            {listPlans.map((plan) => (
-              <PlanCard
-                key={plan.id}
-                title={plan.title}
-                price={plan.price}
-                onCheckout={PushToCheckout}
-              />
-            ))}
-
-            {/* <PlanCard
-              title="All Year Plan"
-              onCheckout={() => PushToCheckout('All Year Plan')}
-            />
-            <PlanCard
-              title="Trail Plan"
-              onCheckout={() => PushToCheckout('Trail Plan')}
-            /> */}
+            {listPlans &&
+              listPlans.map((plan) => (
+                <PlanCard
+                  plan={plan}
+                  key={plan.id}
+                  onCheckout={PushToCheckout}
+                />
+              ))}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import axiosClient from './axiosClientNew';
 
 const planApi = {
-  getAllPlan: (params) => {
+  getAllPlans: (params) => {
     const url = 'plans';
     return axiosClient.get(url, params);
   },

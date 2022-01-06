@@ -2,28 +2,25 @@ import React, { MouseEventHandler } from 'react';
 import './plan-card.scss';
 import { AiFillLike } from 'react-icons/ai';
 import Button from 'components/button/Button';
+import { IPLan } from 'interfaces/Plan';
+import { FixMeLater } from 'interfaces/Migrate';
 
 interface Props {
-  //   name: string;
-  //   price: number;
-  //   content: string[];
-  //   link: string;
-  onCheckout: MouseEventHandler<HTMLDivElement>;
-  title: string;
-  price: number;
+  onCheckout: FixMeLater;
+  plan: IPLan;
 }
 
-const PlanCard = ({ onCheckout, title, price }: Props) => {
+const PlanCard = ({ onCheckout, plan }: Props) => {
   return (
     <div className="w-80 card__container p-6 mb-10 drop-shadow-md ">
       <div className="z-40">
         <div className="flex justify-between items-end mb-4">
-          <div className="text-2xl">{title}</div>
-          <div className="text-xl underline italic">${price}</div>
+          <div className="text-2xl">{plan?.custom_title}</div>
+          <div className="text-xl underline italic">{plan.price}</div>
         </div>
         <div className="h-72">
           <div className="flex justify-between text-sm mb-1 pb-1">
-            <div>No limited limitedlimited limited limited</div>
+            <div>{plan.title}</div>
             <div className="text-2xl text-green-400">
               {' '}
               <AiFillLike />
@@ -46,10 +43,7 @@ const PlanCard = ({ onCheckout, title, price }: Props) => {
         </div>
         <div className="flex justify-center items-center">
           {/* @ts-ignore */}
-          <Button
-            onClick={() => onCheckout({ title, price } as any)}
-            className="medium"
-          >
+          <Button onClick={() => onCheckout(plan)} className="medium">
             Subscribe
           </Button>
         </div>

@@ -75,11 +75,12 @@ const MovieGrid = (props) => {
   };
 
   useEffect(() => {
+    dispatch(setLoading(true));
     const getList = async () => {
-      dispatch(setLoading(true));
       let responseMovies = null;
       let responseCategories = null;
       let newMovies = null;
+
       if (keyword === undefined) {
         const params = {};
         const reponseNewMovies = await movieApi.getAll({ params });
@@ -118,7 +119,6 @@ const MovieGrid = (props) => {
       newMovies = mapMoviesByType(newMovies, props.category);
 
       const listItems = mergeMovieLists(responseMovies.results, newMovies);
-
       setItems(listItems);
 
       if (!keyword) {
