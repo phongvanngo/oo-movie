@@ -47,7 +47,9 @@ export const SaveCheckoutData = (
 
 export const checkDiscountCode = async (code) => {
   try {
-    const response = await discountApi.getDiscountByCode({ code: code });
+    const response = await discountApi.getDiscountByCode({
+      params: { code: code },
+    });
     return Promise.resolve(response.data);
   } catch (error) {
     return Promise.reject(error);
@@ -56,7 +58,7 @@ export const checkDiscountCode = async (code) => {
 
 export const UseDiscountCode = async (id) => {
   try {
-    const response = await discountApi.useDiscount({ id: id });
+    const response = await discountApi.useDiscount({ params: { id: id } });
     return Promise.resolve(response);
   } catch (error) {
     return Promise.reject(error);

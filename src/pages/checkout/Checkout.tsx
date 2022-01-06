@@ -119,8 +119,9 @@ export default function Checkout({}: Props): ReactElement {
   };
 
   const addPromotion = () => {
+    dispatch(setLoading(true));
     checkDiscountCode(promotionInput)
-      .then((data) => {
+      .then((data: IDiscount) => {
         setIsValidCode(true);
         setPromotionState(data);
         const total =
@@ -130,6 +131,9 @@ export default function Checkout({}: Props): ReactElement {
       })
       .catch(() => {
         setIsValidCode(false);
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
       });
   };
 

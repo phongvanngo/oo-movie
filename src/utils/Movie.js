@@ -12,9 +12,9 @@ export const mergeMovieLists = (theDbList, newList) => {
 export const mapMoviesByType = (originalList, type) => {
   let newList = [];
   if (type === category.movie) {
-    newList = originalList.filter((movie) => !movie.isTVSeries);
+    newList = originalList.filter((movie) => !movie.is_tv_series);
   } else {
-    newList = originalList.filter((movie) => movie.isTVSeries);
+    newList = originalList.filter((movie) => movie.is_tv_series);
   }
   return newList;
 };

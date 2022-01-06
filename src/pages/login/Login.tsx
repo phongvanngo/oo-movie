@@ -28,17 +28,17 @@ export default function LoginPage({}: Props): ReactElement {
       try {
         const logindata = { ...data };
         delete logindata.role;
-        response = await commonApi.login(data);
+        response = await commonApi.login(logindata);
       } catch (error) {
         console.log('erorr', error);
       }
     }
-    saveToken(response?.data);
+    saveToken(response!.data);
   };
 
   const saveToken = (data: FixMeLater) => {
-    if (data && data?.access_token) {
-      localStorage.setItem('ootoken', data?.access_token);
+    if (data && data?.accessToken) {
+      localStorage.setItem('ootoken', data?.accessToken);
     }
   };
 

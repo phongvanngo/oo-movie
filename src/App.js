@@ -39,8 +39,8 @@ function App() {
 
   return (
     <Router>
-      <Header />
       <LoadingOverlay active={loading} spinner text="Please wait...">
+        <Header />
         <Switch>
           {routes.map((route, index) => {
             if (route.protected) {
@@ -72,8 +72,8 @@ function App() {
           })}
           ;
         </Switch>
+        <Footer />
       </LoadingOverlay>
-      <Footer />
     </Router>
   );
 }

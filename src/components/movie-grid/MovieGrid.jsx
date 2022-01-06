@@ -14,9 +14,12 @@ import {
   updateDisplayCategories,
   clearSelectedCategories,
 } from 'utils/Category';
+import { useAppDispatch } from 'redux/hooks';
+import { setLoading } from 'redux/reducer/loader';
 
 const MovieGrid = (props) => {
   const [items, setItems] = useState([]);
+  const listItemsToFilter = useRef();
 
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(0);
@@ -24,10 +27,9 @@ const MovieGrid = (props) => {
   const { keyword } = useParams();
 
   const [categories, setCategories] = useState([]);
-
   const [activeCategories, setActiveCategories] = useState([]);
 
-  const listItemsToFilter = useRef();
+  const dispatch = useAppDispatch();
 
   //   Trigger khi click vao category item
   const FilterCategory = (selectedCate) => {
@@ -74,6 +76,7 @@ const MovieGrid = (props) => {
 
   useEffect(() => {
     const getList = async () => {
+      dispatch(setLoading(true));
       let responseMovies = null;
       let responseCategories = null;
       let newMovies = null;
@@ -126,7 +129,9 @@ const MovieGrid = (props) => {
 
       setTotalPage(responseMovies.total_pages);
     };
-    getList();
+    getList().finally(() => {
+      dispatch(setLoading(false));
+    });
   }, [props.category, keyword]);
 
   useEffect(() => {
