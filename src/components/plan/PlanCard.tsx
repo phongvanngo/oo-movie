@@ -15,8 +15,8 @@ const PlanCard = ({ onCheckout, plan }: Props) => {
     <div className="w-80 card__container p-6 mb-10 drop-shadow-md ">
       <div className="z-40">
         <div className="flex justify-between items-end mb-4">
-          <div className="text-2xl">{plan?.custom_title}</div>
-          <div className="text-xl underline italic">{plan.price}</div>
+          <div className="text-2xl">{plan?.title}</div>
+          <div className="text-xl underline italic">${plan.price}</div>
         </div>
         <div className="h-72">
           <div className="flex justify-between text-sm mb-1 pb-1">

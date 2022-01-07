@@ -7,7 +7,7 @@ import MovieList from 'components/movie-list/MovieList';
 import VideoPlayer from 'components/videoplayer';
 import { FixMeLater } from 'interfaces/Migrate';
 import { IComment, MovieModelMapPattern } from 'interfaces/MovideDetail';
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useParams, useLocation, useHistory } from 'react-router';
 import { MapVariable } from 'utils/MapVariables';
 import './theater.scss';
@@ -19,16 +19,6 @@ type RouterParams = {
   category: string;
   id: string;
   episode: string;
-};
-
-const videoJsOptions = {
-  sources: [
-    {
-      // src: '//vjs.zencdn.net/v/oceans.mp4',
-      src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-      type: 'video/mp4',
-    },
-  ],
 };
 
 const commentData: IComment[] = [
@@ -68,7 +58,14 @@ export default function Theater({}: Props): ReactElement {
   const [currentEpisodeObject, setCurrentEpisodeObject] =
     useState<FixMeLater>(null);
 
-  const [movieLink, setMovieLink] = useState<FixMeLater>(null);
+  const [movieSource, setMovieSource] = useState<FixMeLater>({
+    sources: [
+      {
+        src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+        type: 'video/mp4',
+      },
+    ],
+  });
 
   const getDownloadLink = async (episodeObj: FixMeLater) => {
     const contentLink = episodeObj.content;
@@ -78,8 +75,15 @@ export default function Theater({}: Props): ReactElement {
         params: { path: contentLink },
       });
       const data = responseList!.data;
-      setMovieLink(data);
-      //   console.log(data);
+      setMovieSource({
+        sources: [
+          {
+            src: `${data}`,
+            type: 'video/mp4',
+          },
+        ],
+      });
+      console.log(data);
     } catch (error) {}
     window.scrollTo(0, 0);
   };
@@ -162,7 +166,7 @@ export default function Theater({}: Props): ReactElement {
 
           <div className="section">
             <div className=" movie mb-8">
-              <VideoPlayer options={videoJsOptions} />
+              <VideoPlayer options={movieSource} />
             </div>
             <div className="flex mb-10">
               <div className="w-3/4">

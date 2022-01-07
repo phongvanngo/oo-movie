@@ -30,11 +30,6 @@ type Inputs = {
   number: string;
 };
 
-interface IPromotion {
-  code: string;
-  discount: number;
-}
-
 export default function Checkout({}: Props): ReactElement {
   // State luu tru giu lieu khi route khach push vao component nay
   const [itemPurchasing, setItemPurchasing] = useState<FixMeLater>(null);

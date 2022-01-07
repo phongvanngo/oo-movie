@@ -1,18 +1,11 @@
-import PlanCard from 'components/plan/PlanCard';
-import React, {
-  MouseEventHandler,
-  ReactElement,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import PageHeader from '../../components/page-header/PageHeader';
-import { useHistory } from 'react-router-dom';
-import { FixMeLater } from 'interfaces/Migrate';
 import planApi from 'api/oomovie/planApi';
+import PlanCard from 'components/plan/PlanCard';
 import { IPLan } from 'interfaces/Plan';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useAppDispatch } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
+import PageHeader from '../../components/page-header/PageHeader';
 
 interface Props {}
 
@@ -36,24 +29,12 @@ export default function Plan({}: Props): ReactElement {
     return;
   };
 
-  const addCustomTitle = (list: IPLan[]) => {
-    const listTitles = ['Chirstmas Plan', 'All Year Plan', 'Trail Plan'];
-    const newList = list.map((item, index) => {
-      return {
-        ...item,
-        custom_title: listTitles[index],
-      };
-    });
-    return newList;
-  };
-
   useEffect(() => {
     dispatch(setLoading(true));
     const getPLans = async () => {
       try {
         const response = await planApi.getAllPlans();
-        const addAttribute = addCustomTitle(response.data);
-        setListPlans(addAttribute);
+        setListPlans(response.data);
       } catch (error) {}
     };
     getPLans().finally(() => {
