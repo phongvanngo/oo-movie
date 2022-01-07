@@ -1,8 +1,9 @@
 import movieApi from 'api/oomovie/movieApi';
 import Button, { OutlineButton } from 'components/button/Button';
+import Comments from 'components/comments';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
 import { MovieModelMapPattern } from 'interfaces/MovideDetail';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
 import { useAppSelector } from 'redux/hooks';
 import { selectorUserHistory } from 'redux/reducer/userHistory';
@@ -14,12 +15,31 @@ import CastList from './CastList';
 import './detail.scss';
 import VideoList from './VideoList';
 
+const commentData = [
+  {
+    id: 1,
+    text: 'Example comment here.',
+    author: 'user2',
+    children: [
+      {
+        id: 2,
+        text: 'Another example comment text.',
+        author: 'user3',
+      },
+    ],
+  },
+  {
+    id: 4,
+    text: 'Example comment here 2.',
+    author: 'user5',
+    children: [],
+  },
+];
+
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
-
-  const [movieDetailTest, setMovieDetailTest] = useState(null);
 
   const userHistory = useAppSelector(selectorUserHistory);
 
@@ -139,17 +159,34 @@ const Detail = () => {
               </div>
             </div>
           </div>
+
           <div className="container">
-            <div className="section mb-3">
-              <VideoList id={item.id} />
-            </div>
-            <div className="section mb-3">
-              <div className="section__header mb-2">
-                <h2>Similar</h2>
+            <div className="flex flex__content">
+              <div className="w-3/4 flex__content__column">
+                <div className="section mb-3">
+                  <VideoList id={item.id} />
+                </div>
+                <div className="section mb-3">
+                  <div className="mb-4 text-lg">Comments</div>
+                  <Comments comments={commentData} />
+                </div>
               </div>
-              <MovieList category={category} type="similar" id={item.id} />
+              <div className="w-1/5  flex__content__column">
+                <div className="section mb-3">
+                  <div className="section__header mb-2">
+                    <h2>Similar</h2>
+                  </div>
+                  <MovieList
+                    category={category}
+                    isVertical={true}
+                    type="similar"
+                    id={item.id}
+                  />
+                </div>
+              </div>
             </div>
           </div>
+
           <Modal active={false} id="PaymentNotification">
             {/* @ts-ignore */}
             <ModalWithButton

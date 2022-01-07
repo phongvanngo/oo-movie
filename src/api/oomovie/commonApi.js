@@ -10,6 +10,11 @@ const commonApi = {
     const url = 'login';
     return axiosClient.post(url, data);
   },
+
+  getUser: () => {
+    const url = 'user';
+    return axiosClient.get(url);
+  },
 };
 
 export default commonApi;

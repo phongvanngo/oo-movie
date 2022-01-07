@@ -118,3 +118,12 @@
 .btns > * ~ * {
   margin-left: 1rem;
 }
+
+.flex__content {
+  max-height: min-content !important;
+  overflow-y: hidden !important;
+  &__column {
+    overflow-y: hidden !important;
+    max-height: min-content;
+  }
+}

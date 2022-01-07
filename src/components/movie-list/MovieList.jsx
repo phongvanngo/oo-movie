@@ -37,6 +37,35 @@ const MovieList = (props) => {
     getList();
   }, []);
 
+  if (props.isVertical) {
+    const numberItem = 5;
+    const list5Items = items.reduce((accumulator, current, index) => {
+      if (index < numberItem) {
+        accumulator.push(current);
+      }
+      return accumulator;
+    }, []);
+    console.log(list5Items);
+    return (
+      <div className="overflow-y-hidden ">
+        <Swiper
+          direction="vertical"
+          spaceBetween={10}
+          paginationClickable
+          autoplayDisableOnInteraction
+          slidesPerView={'auto'}
+          grabCursor={true}
+        >
+          {list5Items.map((item, i) => (
+            <SwiperSlide key={i}>
+              <MovieCard item={item} category={props.category} />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+    );
+  }
+
   return (
     <div className="movie-list">
       <Swiper grabCursor={true} spaceBetween={10} slidesPerView={'auto'}>
