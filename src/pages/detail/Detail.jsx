@@ -4,10 +4,13 @@ import Button, { OutlineButton } from 'components/button/Button';
 import Comments from 'components/comments';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
 import { MovieModelMapPattern } from 'interfaces/MovideDetail';
+import { getListComments } from 'module/comment/commentModule';
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
 import { useAppSelector } from 'redux/hooks';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
 import { selectorUserHistory } from 'redux/reducer/userHistory';
+import { filterDisplayComments } from 'utils/comment';
 import { MapVariable } from 'utils/MapVariables';
 import apiConfig from '../../api/apiConfig';
 import tmdbApi from '../../api/tmdbApi';
@@ -16,33 +19,14 @@ import CastList from './CastList';
 import './detail.scss';
 import VideoList from './VideoList';
 
-const commentData = [
-  {
-    id: 1,
-    text: 'Example comment here.',
-    author: 'user2',
-    children: [
-      {
-        id: 2,
-        text: 'Another example comment text.',
-        author: 'user3',
-      },
-    ],
-  },
-  {
-    id: 4,
-    text: 'Example comment here 2.',
-    author: 'user5',
-    children: [],
-  },
-];
-
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
 
   const userHistory = useAppSelector(selectorUserHistory);
+
+  const authUserInfor = useAppSelector(selectorUser);
 
   let history = useHistory();
 
@@ -114,17 +98,12 @@ const Detail = () => {
       window.scrollTo(0, 0);
     };
 
-    const getListComments = async () => {
-      try {
-        const response = await userCommentApi.getCommentByMovieID({
-          params: { status: 'Accept', movie_id: id },
-        });
-        setListComments(response.data);
-      } catch (error) {}
-    };
+    getListComments(id).then((data) => {
+      const displayComments = filterDisplayComments(data, authUserInfor?.uid);
+      setListComments(displayComments);
+    });
 
     getDetail();
-    getListComments();
   }, [category, id]);
 
   return (

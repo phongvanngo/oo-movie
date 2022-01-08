@@ -50,24 +50,6 @@ export interface MovieDetail {
 }
 
 // ======== Comment interfaces==========
-export interface ICommentChild {
-  id: number;
-  text: string;
-  author: string;
-}
-
-export interface IComment {
-  id: number;
-  text: string;
-  author: string;
-  children?: ICommentChild[];
-}
-
-export interface ICommentData {
-  title?: string;
-  author?: string;
-  comments?: IComment[] | undefined;
-}
 
 export const MovieModelMapPattern = {
   //   release_date: 'releaseDate',

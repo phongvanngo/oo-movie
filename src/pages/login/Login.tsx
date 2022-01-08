@@ -35,6 +35,8 @@ export default function LoginPage({}: Props): ReactElement {
       };
       response = await commonApi.register(registerData);
     } catch (error) {
+      console.log('erorr', error);
+    } finally {
       try {
         response = await commonApi.login(data);
       } catch (error) {

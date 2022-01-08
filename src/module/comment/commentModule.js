@@ -12,3 +12,13 @@ export const leaveComment = async (commentValue, movieID) => {
     console.log(error);
   }
 };
+
+export const getListComments = async (id) => {
+  try {
+    const response = await userCommentApi.getCommentByMovieID({
+      params: { movie_id: id },
+    });
+
+    return Promise.resolve(response.data);
+  } catch (error) {}
+};

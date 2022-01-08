@@ -6,12 +6,17 @@ import MovieChappers from 'components/movie-chappers/MovieChappers';
 import MovieList from 'components/movie-list/MovieList';
 import VideoPlayer from 'components/videoplayer';
 import { FixMeLater } from 'interfaces/Migrate';
-import { IComment, MovieModelMapPattern } from 'interfaces/MovideDetail';
+import { MovieModelMapPattern } from 'interfaces/MovideDetail';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useParams, useLocation, useHistory } from 'react-router';
 import { MapVariable } from 'utils/MapVariables';
 import './theater.scss';
 import queryString from 'query-string';
+import { getListComments } from 'module/comment/commentModule';
+import { filterDisplayComments } from 'utils/comment';
+import { IComment } from 'interfaces/Comment';
+import { useAppSelector } from 'redux/hooks';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
 
 interface Props {}
 
@@ -20,27 +25,6 @@ type RouterParams = {
   id: string;
   episode: string;
 };
-
-const commentData: IComment[] = [
-  {
-    id: 1,
-    text: 'Example comment here.',
-    author: 'user2',
-    children: [
-      {
-        id: 2,
-        text: 'Another example comment text.',
-        author: 'user3',
-      },
-    ],
-  },
-  {
-    id: 4,
-    text: 'Example comment here 2.',
-    author: 'user5',
-    children: [],
-  },
-];
 
 export default function Theater({}: Props): ReactElement {
   const { category, id } = useParams<RouterParams>();
@@ -52,6 +36,10 @@ export default function Theater({}: Props): ReactElement {
   const history = useHistory();
 
   const [item, setItem] = useState<FixMeLater>(null);
+
+  const [listComments, setListComments] = useState<IComment[] | null>(null);
+
+  const authUserInfor = useAppSelector(selectorUser);
 
   const [listEpisodes, setListEpisodes] = useState<FixMeLater>(null);
 
@@ -120,6 +108,11 @@ export default function Theater({}: Props): ReactElement {
         }
       } catch (error) {}
     };
+
+    getListComments(id).then((data: FixMeLater) => {
+      const displayComments = filterDisplayComments(data, authUserInfor?.uid);
+      setListComments(displayComments);
+    });
     getEpisodes();
   }, []);
 
@@ -179,7 +172,7 @@ export default function Theater({}: Props): ReactElement {
                 </div>
                 <div className="pr-6">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments comments={commentData} />
+                  <Comments comments={listComments} />
                 </div>
               </div>
               <div className="w-1/4 bg-gray-700 pr-6 text-black">Banner QC</div>

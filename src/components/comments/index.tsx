@@ -1,14 +1,14 @@
 import React, { ReactElement, useState } from 'react';
 import Comment from './CommentCard';
 import InputComment from './InputComment';
-import { IComment } from 'interfaces/MovideDetail';
 import userCommentApi from 'api/oomovie/userCommentApi';
-import { leaveComment } from 'module/comment/comment';
+import { leaveComment } from 'module/comment/commentModule';
 import { useAppDispatch } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
+import { IComment } from 'interfaces/Comment';
 
 interface Props {
-  comments: IComment[];
+  comments: IComment[] | null;
   movieID?: string;
 }
 
