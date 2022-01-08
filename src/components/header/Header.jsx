@@ -18,6 +18,7 @@ const Header = () => {
   const HeaderSignOut = () => {
     SignOut();
     // dispatch(updateUserHistory({}));
+    localStorage.removeItem('ootoken');
     dispatch(setCurrentUser(null));
     history.push('/');
   };

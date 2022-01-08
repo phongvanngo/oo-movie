@@ -1,4 +1,5 @@
 import movieApi from 'api/oomovie/movieApi';
+import userCommentApi from 'api/oomovie/userCommentApi';
 import Button, { OutlineButton } from 'components/button/Button';
 import Comments from 'components/comments';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
@@ -46,6 +47,8 @@ const Detail = () => {
   let history = useHistory();
 
   const location = useLocation();
+
+  const [listComments, setListComments] = useState([]);
 
   const setModalVisible = () => {
     const modal = document.querySelector(`#PaymentNotification`);
@@ -110,7 +113,18 @@ const Detail = () => {
       console.log('movie detail ne', movieDetail);
       window.scrollTo(0, 0);
     };
+
+    const getListComments = async () => {
+      try {
+        const response = await userCommentApi.getCommentByMovieID({
+          params: { status: 'Accept', movie_id: id },
+        });
+        setListComments(response.data);
+      } catch (error) {}
+    };
+
     getDetail();
+    getListComments();
   }, [category, id]);
 
   return (
@@ -168,7 +182,7 @@ const Detail = () => {
                 </div>
                 <div className="section mb-3">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments comments={commentData} />
+                  <Comments comments={listComments} movieID={item.id} />
                 </div>
               </div>
               <div className="w-1/5  flex__content__column">

@@ -20,15 +20,23 @@ export default function LoginPage({}: Props): ReactElement {
 
   const dispatch = useAppDispatch();
 
-  const registerAndSignIn = async (data: FixMeLater) => {
+  const registerAndSignIn = async (user: FixMeLater) => {
+    const data = {
+      username: user!.uid,
+      password: '12345678',
+    };
+
     let response = null;
     try {
-      response = await commonApi.register(data);
+      const registerData = {
+        ...data,
+        fullname: user!.displayName,
+        role: 'Subscriber',
+      };
+      response = await commonApi.register(registerData);
     } catch (error) {
       try {
-        const logindata = { ...data };
-        delete logindata.role;
-        response = await commonApi.login(logindata);
+        response = await commonApi.login(data);
       } catch (error) {
         console.log('erorr', error);
       }
@@ -50,13 +58,8 @@ export default function LoginPage({}: Props): ReactElement {
         history.push('/');
         const user: any = result.user?.toJSON();
         //Goi dang nhap => Luu token
-        const data = {
-          username: user!.uid,
-          password: '12345678',
-          role: 'Subscriber',
-        };
 
-        registerAndSignIn(data);
+        registerAndSignIn(user);
 
         dispatch(setCurrentUser(user));
         LocalStorageHandle(user);

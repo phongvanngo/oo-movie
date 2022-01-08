@@ -38,14 +38,14 @@ const MovieList = (props) => {
   }, []);
 
   if (props.isVertical) {
-    const numberItem = 5;
+    const numberItem = 7;
     const list5Items = items.reduce((accumulator, current, index) => {
       if (index < numberItem) {
         accumulator.push(current);
       }
       return accumulator;
     }, []);
-    console.log(list5Items);
+
     return (
       <div className="overflow-y-hidden ">
         <Swiper

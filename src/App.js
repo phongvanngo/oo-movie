@@ -24,7 +24,7 @@ function App() {
       if (user) {
         const userParsed = user.toJSON();
         dispatch(setCurrentUser(userParsed));
-
+        console.log(userParsed);
         //Truong hop reload lai page thi update state local storage (truong hop sign in roi)
         const userLocalStorage = localStorage.getItem(`${userParsed.email}`);
         if (userLocalStorage) {
