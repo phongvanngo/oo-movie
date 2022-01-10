@@ -20,7 +20,7 @@ export default function Profile({}: Props): ReactElement {
   const globalUser = useAppSelector(selectorUser);
 
   const [displayName, setDisplayName] = useState<FixMeLater>(
-    globalUser.displayName
+    globalUser?.displayName
   );
   const [currentPassword, setCurrentPassword] = useState<FixMeLater>('');
   const [newPassword, setNewPassword] = useState<FixMeLater>('');
@@ -124,7 +124,7 @@ export default function Profile({}: Props): ReactElement {
                 id=""
                 className="w-full"
                 disabled
-                value={auth.currentUser!.email?.toString()}
+                value={auth.currentUser?.email?.toString()}
               />
             </div>
           </div>

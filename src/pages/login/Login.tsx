@@ -43,12 +43,24 @@ export default function LoginPage({}: Props): ReactElement {
         console.log('erorr', error);
       }
     }
-    saveToken(response!.data);
+    await saveToken(response?.data);
+    getUser();
   };
 
-  const saveToken = (data: FixMeLater) => {
+  const saveToken = async (data: FixMeLater) => {
     if (data && data?.accessToken) {
       localStorage.setItem('ootoken', data?.accessToken);
+      return Promise.resolve();
+    }
+    return Promise.reject();
+  };
+
+  const getUser = async () => {
+    try {
+      const response = await commonApi.getUser();
+      localStorage.setItem('user', JSON.stringify(response?.data));
+    } catch (error) {
+      console.log(error);
     }
   };
 

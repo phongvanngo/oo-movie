@@ -26,7 +26,7 @@ export default function Comment({ comment }: FixMeLater): ReactElement {
         <div className=" border border-gray-300 w-full rounded-md p-3 bg-white text-black">
           <div className="flex items-center">
             <div className="font-semibold cursor-pointer mb-1 mr-2">
-              {comment?.user?.name}
+              {comment?.user?.fullname}
             </div>
             <div className="text-xs opacity-70">{dateTime}</div>
           </div>

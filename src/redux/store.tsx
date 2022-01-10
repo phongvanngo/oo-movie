@@ -3,6 +3,7 @@ import counterReducer from 'redux/counter/counterSlice';
 import authenticateReducer from './reducer/authenticateSlice';
 import loaderReducer from './reducer/loader';
 import moviesReducer from './reducer/movieSlice';
+import userFromAPIReducer from './reducer/userFromAPI';
 import userHistoryReducer from './reducer/userHistory';
 
 export const store = configureStore({
@@ -10,6 +11,7 @@ export const store = configureStore({
     counter: counterReducer,
     authenUser: authenticateReducer,
     loader: loaderReducer,
+    userFromApi: userFromAPIReducer,
     // movie: moviesReducer,
     userHistory: userHistoryReducer,
   },

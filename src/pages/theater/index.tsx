@@ -15,8 +15,9 @@ import queryString from 'query-string';
 import { getListComments } from 'module/comment/commentModule';
 import { filterDisplayComments } from 'utils/comment';
 import { IComment } from 'interfaces/Comment';
-import { useAppSelector } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser } from 'redux/reducer/authenticateSlice';
+import { setLoading } from 'redux/reducer/loader';
 
 interface Props {}
 
@@ -39,12 +40,12 @@ export default function Theater({}: Props): ReactElement {
 
   const [listComments, setListComments] = useState<IComment[] | null>(null);
 
-  const authUserInfor = useAppSelector(selectorUser);
-
   const [listEpisodes, setListEpisodes] = useState<FixMeLater>(null);
 
   const [currentEpisodeObject, setCurrentEpisodeObject] =
     useState<FixMeLater>(null);
+
+  const dispatch = useAppDispatch();
 
   const [movieSource, setMovieSource] = useState<FixMeLater>({
     sources: [
@@ -56,7 +57,7 @@ export default function Theater({}: Props): ReactElement {
   });
 
   const getDownloadLink = async (episodeObj: FixMeLater) => {
-    const contentLink = episodeObj.content;
+    const contentLink = episodeObj?.content;
 
     try {
       const responseList = await movieApi.getDownloadLink({
@@ -82,6 +83,8 @@ export default function Theater({}: Props): ReactElement {
   };
 
   useEffect(() => {
+    dispatch(setLoading(true));
+
     const getEpisodes = async () => {
       let responseList = null;
       try {
@@ -110,10 +113,12 @@ export default function Theater({}: Props): ReactElement {
     };
 
     getListComments(id).then((data: FixMeLater) => {
-      const displayComments = filterDisplayComments(data, authUserInfor?.uid);
+      const displayComments = filterDisplayComments(data);
       setListComments(displayComments);
     });
-    getEpisodes();
+    getEpisodes().finally(() => {
+      dispatch(setLoading(false));
+    });
   }, []);
 
   useEffect(() => {
@@ -139,8 +144,10 @@ export default function Theater({}: Props): ReactElement {
       const currentEps = getEpisodeByName(listEpisodes);
 
       setCurrentEpisodeObject(currentEps);
-
-      getDownloadLink(currentEps);
+      dispatch(setLoading(true));
+      getDownloadLink(currentEps).finally(() => {
+        dispatch(setLoading(false));
+      });
     }
   }, [episode]);
 
@@ -172,7 +179,7 @@ export default function Theater({}: Props): ReactElement {
                 </div>
                 <div className="pr-6">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments comments={listComments} />
+                  <Comments comments={listComments} movieID={id} />
                 </div>
               </div>
               <div className="w-1/4 bg-gray-700 pr-6 text-black">Banner QC</div>

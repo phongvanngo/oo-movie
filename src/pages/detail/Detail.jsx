@@ -7,8 +7,9 @@ import { MovieModelMapPattern } from 'interfaces/MovideDetail';
 import { getListComments } from 'module/comment/commentModule';
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
-import { useAppSelector } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser } from 'redux/reducer/authenticateSlice';
+import { setLoading } from 'redux/reducer/loader';
 import { selectorUserHistory } from 'redux/reducer/userHistory';
 import { filterDisplayComments } from 'utils/comment';
 import { MapVariable } from 'utils/MapVariables';
@@ -26,7 +27,7 @@ const Detail = () => {
 
   const userHistory = useAppSelector(selectorUserHistory);
 
-  const authUserInfor = useAppSelector(selectorUser);
+  const dispatch = useAppDispatch();
 
   let history = useHistory();
 
@@ -99,11 +100,13 @@ const Detail = () => {
     };
 
     getListComments(id).then((data) => {
-      const displayComments = filterDisplayComments(data, authUserInfor?.uid);
+      const displayComments = filterDisplayComments(data);
       setListComments(displayComments);
     });
-
-    getDetail();
+    dispatch(setLoading(true));
+    getDetail().finally(() => {
+      dispatch(setLoading(false));
+    });
   }, [category, id]);
 
   return (

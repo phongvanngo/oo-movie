@@ -1,4 +1,5 @@
 import axiosClient from 'api/oomovie/axiosClientNew';
+import checkoutApi from 'api/oomovie/checkoutApi';
 import discountApi from 'api/oomovie/discountApi';
 import { updateUserHistory } from 'redux/reducer/userHistory';
 
@@ -62,5 +63,35 @@ export const UseDiscountCode = async (id) => {
     return Promise.resolve(response);
   } catch (error) {
     return Promise.reject(error);
+  }
+};
+
+export const createOrder = async (purchasingItems, discount) => {
+  console.log(discount.code === true);
+  let data = {
+    movie_ids: [],
+    plan_id: null,
+    discount_code: discount.code ? discount.code : null,
+  };
+  if (purchasingItems.isPlan) {
+    data = {
+      ...data,
+      movie_ids: null,
+      plan_id: purchasingItems?.item?.id,
+    };
+  } else {
+    data = {
+      ...data,
+      movie_ids: [purchasingItems?.item?.id],
+      plan_id: null,
+    };
+  }
+
+  try {
+    const response = await checkoutApi.createOrder(data);
+    UseDiscountCode(discount?.id);
+    return Promise.resolve(response);
+  } catch (error) {
+    console.log(error);
   }
 };

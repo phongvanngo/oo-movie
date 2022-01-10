@@ -5,6 +5,7 @@ import { DiscountInitialValue, IDiscount } from 'interfaces/Discount';
 import { FixMeLater } from 'interfaces/Migrate';
 import {
   checkDiscountCode,
+  createOrder,
   SaveCheckoutData,
   UseDiscountCode,
 } from 'module/checkout/checkout';
@@ -55,23 +56,21 @@ export default function Checkout({}: Props): ReactElement {
   const form = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    SaveCheckoutData(
-      userHistory,
-      itemPurchasing,
-      promotionState,
-      total,
-      dispatch
-    );
-
     dispatch(setLoading(true));
-    if (promotionState.remaining_amount > 0) {
-      UseDiscountCode(promotionState.id);
-    }
 
-    setTimeout(() => {
+    createOrder(itemPurchasing, promotionState).then((data) => {
+      SaveCheckoutData(
+        userHistory,
+        itemPurchasing,
+        promotionState,
+        total,
+        dispatch
+      );
+
       setModalVisible();
+
       dispatch(setLoading(false));
-    }, 4000);
+    });
   };
 
   //   ======== Component did mout ==============

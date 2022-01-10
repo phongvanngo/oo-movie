@@ -18,9 +18,14 @@ const Header = () => {
   const HeaderSignOut = () => {
     SignOut();
     // dispatch(updateUserHistory({}));
-    localStorage.removeItem('ootoken');
+    clearLocalStorage();
     dispatch(setCurrentUser(null));
     history.push('/');
+  };
+
+  const clearLocalStorage = () => {
+    localStorage.removeItem('ootoken');
+    localStorage.removeItem('user');
   };
 
   const DropDownHeader = () => (

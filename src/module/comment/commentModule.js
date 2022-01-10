@@ -1,6 +1,7 @@
 import userCommentApi from 'api/oomovie/userCommentApi';
 
 export const leaveComment = async (commentValue, movieID) => {
+  console.log(movieID);
   const data = {
     movie_id: movieID,
     content: commentValue,
