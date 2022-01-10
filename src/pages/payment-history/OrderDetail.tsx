@@ -19,7 +19,7 @@ export default function OrderDetail({ order, user }: Props): ReactElement {
         <div className="flex-1">
           <div className="font-semibold text-center">Customer information</div>
           <div className="mb-1.5">
-            <span className="underline">Name:</span> {order?.user.fullname}
+            <span className="underline">Name:</span> {user?.displayName}
           </div>
           <div className="mb-1.5">
             <span className="underline">Email:</span> {user?.email}

@@ -1,14 +1,13 @@
-import React, { ReactElement, useEffect, useState } from 'react';
-import ProfileLayout from 'layout/profile/ProfileLayout';
-import { FixMeLater } from 'interfaces/Migrate';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { selectorUserHistory } from 'redux/reducer/userHistory';
-import Modal, { ModalWithButton } from 'components/modal/Modal';
-import { Order } from 'interfaces/Order';
 import checkoutApi from 'api/oomovie/checkoutApi';
+import Modal, { ModalWithButton } from 'components/modal/Modal';
+import { FixMeLater } from 'interfaces/Migrate';
+import { Order } from 'interfaces/Order';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
+import { setLoading } from 'redux/reducer/loader';
 import { numberToDate } from 'utils/commonConvert';
 import OrderDetail from './OrderDetail';
-import { setLoading } from 'redux/reducer/loader';
 
 interface Props {
   order: Order;
@@ -63,7 +62,7 @@ export default function PaymentHistory({}: Props): ReactElement {
 
   const [listOrders, setListOrders] = useState<Order[] | []>([]);
 
-  const userHistory = useAppSelector(selectorUserHistory);
+  const userAuth = useAppSelector(selectorUser);
 
   const dispatch = useAppDispatch();
 
@@ -83,7 +82,7 @@ export default function PaymentHistory({}: Props): ReactElement {
         user = JSON.parse(user);
         try {
           const response = await checkoutApi.getOrders({
-            params: { id: user?.id },
+            params: { user_id: user?.id },
           });
           setListOrders(response.data);
           console.log(response.data);
@@ -98,6 +97,10 @@ export default function PaymentHistory({}: Props): ReactElement {
     });
     window.scrollTo(0, 0);
   }, []);
+
+  if (listOrders.length < 1) {
+    return <div>You haven't made any payment yet</div>;
+  }
 
   return (
     <div>
@@ -114,7 +117,7 @@ export default function PaymentHistory({}: Props): ReactElement {
       <Modal active={false} id="orderdetail">
         {/* @ts-ignore */}
         <ModalWithButton okContent="Ok" onOk={() => {}}>
-          <OrderDetail order={currentOrderDetail} user={userHistory} />
+          <OrderDetail order={currentOrderDetail} user={userAuth} />
         </ModalWithButton>
       </Modal>
     </div>

@@ -164,7 +164,11 @@ const Detail = () => {
                 </div>
                 <div className="section mb-3">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments comments={listComments} movieID={item.id} />
+                  <Comments
+                    comments={listComments}
+                    updateComments={setListComments}
+                    movieID={item.id}
+                  />
                 </div>
               </div>
               <div className="w-1/5  flex__content__column">

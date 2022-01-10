@@ -52,15 +52,18 @@ export default function MyMovies({}: Props): ReactElement {
 
       <div className="font-semibold mb-4 text-lg">My movies</div>
       <div className="grid grid-cols-4 gap-3">
-        {userData.boughtMovies.map((item: any, i: any) => (
-          <div className="w-44" key={i}>
-            <MovieCard
-              key={i}
-              item={item}
-              category={item.number_of_episodes ? category.tv : category.movie}
-            />
-          </div>
-        ))}
+        {userData?.boughtMovies &&
+          userData?.boughtMovies.map((item: any, i: any) => (
+            <div className="w-44" key={i}>
+              <MovieCard
+                key={i}
+                item={item}
+                category={
+                  item.number_of_episodes ? category.tv : category.movie
+                }
+              />
+            </div>
+          ))}
       </div>
     </>
   );

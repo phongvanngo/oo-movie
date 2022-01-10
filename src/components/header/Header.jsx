@@ -5,6 +5,7 @@ import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
 import { updateUserHistory } from 'redux/reducer/userHistory';
+import { clearLocalStorage } from 'utils/localstorage';
 import logo from '../../assets/tmovie.png';
 import './header.scss';
 
@@ -20,12 +21,8 @@ const Header = () => {
     // dispatch(updateUserHistory({}));
     clearLocalStorage();
     dispatch(setCurrentUser(null));
-    history.push('/');
-  };
 
-  const clearLocalStorage = () => {
-    localStorage.removeItem('ootoken');
-    localStorage.removeItem('user');
+    history.push('/');
   };
 
   const DropDownHeader = () => (

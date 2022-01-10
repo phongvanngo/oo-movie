@@ -12,6 +12,7 @@ import './login.scss';
 import { FixMeLater } from 'interfaces/Migrate';
 import { updateUserHistory } from 'redux/reducer/userHistory';
 import commonApi from 'api/oomovie/commonApi';
+import { setUserFromAPI } from 'redux/reducer/userFromAPI';
 interface Props {}
 
 export default function LoginPage({}: Props): ReactElement {

@@ -179,7 +179,11 @@ export default function Theater({}: Props): ReactElement {
                 </div>
                 <div className="pr-6">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments comments={listComments} movieID={id} />
+                  <Comments
+                    comments={listComments}
+                    updateComments={setListComments}
+                    movieID={id}
+                  />
                 </div>
               </div>
               <div className="w-1/4 bg-gray-700 pr-6 text-black">Banner QC</div>

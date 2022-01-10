@@ -2,9 +2,10 @@ import { SignOut } from 'module/auth';
 import React, { ReactChildren, ReactElement, ReactNode } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
-import { useAppDispatch } from 'redux/hooks';
-import { setCurrentUser } from 'redux/reducer/authenticateSlice';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
 import backgroundImage from 'testimage/captain.jpg';
+import { clearLocalStorage } from 'utils/localstorage';
 import './profile-layout.scss';
 
 interface Props {
@@ -45,10 +46,12 @@ export default function ProfileLayout({
   const history = useHistory();
 
   const dispatch = useAppDispatch();
+  const userAuth = useAppSelector(selectorUser);
 
   const LogOut = () => {
     SignOut();
     dispatch(setCurrentUser(null));
+    clearLocalStorage();
     history.push('/');
   };
 
@@ -95,7 +98,10 @@ export default function ProfileLayout({
         </div>
 
         <div className="profile__main">
-          <div className="profile__main__notification">Welcome {userName}</div>
+          <div className="profile__main__notification">
+            <div>Welcome back {userAuth?.displayName}!</div>
+            <div>Your last movie is ....</div>
+          </div>
           <div className="profile__main__content">
             <div className="p-4">{children}</div>
           </div>
