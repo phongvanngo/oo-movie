@@ -9,7 +9,9 @@ import PageHeader from '../../components/page-header/PageHeader';
 import { Providers } from '../../config/firebase';
 import { SignInWithSocialMedia } from '../../module/auth';
 import './login.scss';
-
+import { FixMeLater } from 'interfaces/Migrate';
+import { updateUserHistory } from 'redux/reducer/userHistory';
+import commonApi from 'api/oomovie/commonApi';
 interface Props {}
 
 export default function LoginPage({}: Props): ReactElement {
@@ -18,18 +20,87 @@ export default function LoginPage({}: Props): ReactElement {
 
   const dispatch = useAppDispatch();
 
+  const registerAndSignIn = async (user: FixMeLater) => {
+    const data = {
+      username: user!.uid,
+      password: '12345678',
+    };
+
+    let response = null;
+    try {
+      const registerData = {
+        ...data,
+        fullname: user!.displayName,
+        role: 'Subscriber',
+      };
+      response = await commonApi.register(registerData);
+    } catch (error) {
+      console.log('erorr', error);
+    } finally {
+      try {
+        response = await commonApi.login(data);
+      } catch (error) {
+        console.log('erorr', error);
+      }
+    }
+    await saveToken(response?.data);
+    getUser();
+  };
+
+  const saveToken = async (data: FixMeLater) => {
+    if (data && data?.accessToken) {
+      localStorage.setItem('ootoken', data?.accessToken);
+      return Promise.resolve();
+    }
+    return Promise.reject();
+  };
+
+  const getUser = async () => {
+    try {
+      const response = await commonApi.getUser();
+      localStorage.setItem('user', JSON.stringify(response?.data));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const signInWithSocialMedia = (provider: firebase.auth.AuthProvider) => {
     if (error !== '') setError('');
 
     SignInWithSocialMedia(provider)
       .then((result) => {
         history.push('/');
-        const user = result.user?.toJSON();
+        const user: any = result.user?.toJSON();
+        //Goi dang nhap => Luu token
+
+        registerAndSignIn(user);
+
         dispatch(setCurrentUser(user));
+        LocalStorageHandle(user);
       })
       .catch((error) => {
         setError(error.message);
       });
+  };
+
+  const LocalStorageHandle = (user: FixMeLater) => {
+    // localStorage.setItem('rememberMe', rememberMe);
+    // localStorage.getItem('rememberMe')
+    let thisUser = localStorage.getItem(user.email);
+
+    if (thisUser) {
+      dispatch(updateUserHistory(JSON.parse(thisUser)));
+    } else {
+      const thisUserEmail = user.email;
+      const newUSer = {
+        email: thisUserEmail,
+        isBoughtPlan: false,
+        boughtMovies: [],
+        historyMovies: [],
+        bills: [],
+      };
+      dispatch(updateUserHistory(newUSer));
+    }
   };
 
   const mainref = useRef<HTMLHeadingElement>(null);

@@ -1,25 +1,47 @@
+import planApi from 'api/oomovie/planApi';
 import PlanCard from 'components/plan/PlanCard';
-import React, { ReactElement, useEffect, useRef } from 'react';
-import PageHeader from '../../components/page-header/PageHeader';
+import { IPLan } from 'interfaces/Plan';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useAppDispatch } from 'redux/hooks';
+import { setLoading } from 'redux/reducer/loader';
+import PageHeader from '../../components/page-header/PageHeader';
 
 interface Props {}
 
 const SCROLL_TOP_LOCATION = 80;
 
 export default function Plan({}: Props): ReactElement {
-  useEffect(() => {
-    window.scrollTo({ top: SCROLL_TOP_LOCATION, behavior: 'smooth' });
-  }, []);
-
   const history = useHistory();
 
-  const PushToCheckout = () => {
-    history.push({
-      pathname: '/checkout',
-      state: 'Hello data tu plan ne',
-    });
+  const [listPlans, setListPlans] = useState<IPLan[] | null>(null);
+
+  const dispatch = useAppDispatch();
+
+  const PushToCheckout = (selectedPlan: IPLan) => {
+    let selectedItem = {
+      isPlan: true,
+      item: selectedPlan,
+    };
+
+    localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
+    history.push('/checkout');
+    return;
   };
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    const getPLans = async () => {
+      try {
+        const response = await planApi.getAllPlans();
+        setListPlans(response.data);
+      } catch (error) {}
+    };
+    getPLans().finally(() => {
+      dispatch(setLoading(false));
+    });
+    window.scrollTo({ top: SCROLL_TOP_LOCATION, behavior: 'smooth' });
+  }, []);
 
   return (
     <>
@@ -30,9 +52,14 @@ export default function Plan({}: Props): ReactElement {
             Choose your appropriate plan for you
           </div>
           <div className="md:grid grid-cols-3 gap-10">
-            <PlanCard onCheckout={PushToCheckout} />
-            <PlanCard onCheckout={PushToCheckout} />
-            <PlanCard onCheckout={PushToCheckout} />
+            {listPlans &&
+              listPlans.map((plan) => (
+                <PlanCard
+                  plan={plan}
+                  key={plan.id}
+                  onCheckout={PushToCheckout}
+                />
+              ))}
           </div>
         </div>
       </div>

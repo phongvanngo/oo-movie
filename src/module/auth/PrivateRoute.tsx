@@ -16,7 +16,8 @@ export default function PrivateRoute({
   layout: Layout,
   ...rest
 }: PrivateRouteProps): ReactElement {
-  if (!auth.currentUser) {
+  const user_id = localStorage.getItem('user_id');
+  if (!auth.currentUser && !user_id) {
     return <Redirect to="/sign-in" />;
   }
   if (Layout) {

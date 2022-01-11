@@ -1,3 +1,4 @@
+import { FixMeLater } from 'interfaces/Migrate';
 import * as React from 'react';
 import videojs from 'video.js';
 
@@ -19,17 +20,21 @@ const initialOptions: videojs.PlayerOptions = {
 };
 
 const VideoPlayer: React.FC<IVideoPlayerProps> = ({ options }) => {
-  // const videoNode = React.useRef<HTMLVideoElement>();
   const videoNode = React.useRef() as React.MutableRefObject<HTMLVideoElement>;
   const player = React.useRef<videojs.Player>();
 
   React.useEffect(() => {
+    if (options && options.sources) {
+      videoNode.current.src = options!.sources[0].src;
+    }
+
     player.current = videojs(videoNode.current, {
       ...initialOptions,
       ...options,
     }).ready(function () {
-      // console.log('onPlayerReady', this);
+      console.log('onPlayerReady', videoNode.current);
     });
+
     return () => {
       if (player.current) {
         player.current.dispose();

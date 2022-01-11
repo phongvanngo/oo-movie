@@ -1,23 +1,31 @@
+import ErrorValidation from 'components/errorvalidation/ErrorValidation';
 import { FixMeLater } from 'interfaces/Migrate';
-import React, { ReactElement, useState } from 'react';
-import Cards, { ReactCreditCardProps, Focused } from 'react-credit-cards';
+import React, { ReactElement } from 'react';
+import Cards, { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import {
   formatCreditCardNumber,
   formatCVC,
   formatExpirationDate,
-  formatFormData,
-} from 'utils';
+} from 'utils/FormatPaymentCard';
 
 interface Props {
   cardProps: ReactCreditCardProps;
   setCardProps: React.Dispatch<React.SetStateAction<ReactCreditCardProps>>;
+  form?: FixMeLater;
 }
 
 export default function PaymentCard({
   cardProps,
   setCardProps,
+  form,
 }: Props): ReactElement {
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = form;
+
   const handleCallback = (
     { issuer }: { issuer: FixMeLater },
     isValid: FixMeLater
@@ -54,17 +62,21 @@ export default function PaymentCard({
           callback={handleCallback}
         />
       </div>
-      <form className="flex flex-col ">
+      <form className="flex flex-col" onSubmit={form.handleSubmit()}>
         <div className="payment__input__wrapper">
           <div className="payment__input__wrapper-label">Cardholder Name</div>
           <input
             type="text"
             className="payment__input__wrapper-content"
+            {...register('name', { required: true })}
             name="name"
             placeholder="Name"
             onChange={handleInputChange}
             onFocus={handleInputFocus}
           />
+          {errors.name && (
+            <ErrorValidation>This field is required</ErrorValidation>
+          )}
         </div>
 
         <div className="payment__input__wrapper flex justify-between">
@@ -74,11 +86,15 @@ export default function PaymentCard({
             <input
               className="payment__input__wrapper-content"
               type="tel"
+              {...register('number', { required: true })}
               name="number"
               placeholder="Card Number"
               onChange={handleInputChange}
               onFocus={handleInputFocus}
             />
+            {errors.number && (
+              <ErrorValidation>This field is required</ErrorValidation>
+            )}
           </div>
 
           <div className="w-1/5">
@@ -86,11 +102,13 @@ export default function PaymentCard({
             <input
               type="tel"
               className="payment__input__wrapper-content"
+              {...register('expiry', { required: true })}
               name="expiry"
               placeholder="Expiry"
               onChange={handleInputChange}
               onFocus={handleInputFocus}
             />
+            {errors.expiry && <ErrorValidation>Required</ErrorValidation>}
           </div>
 
           <div className="w-1/5">
@@ -98,11 +116,13 @@ export default function PaymentCard({
             <input
               type="tel"
               className="payment__input__wrapper-content"
+              {...register('cvc', { required: true })}
               name="cvc"
               placeholder="CVC"
               onChange={handleInputChange}
               onFocus={handleInputFocus}
             />
+            {errors.cvc && <ErrorValidation>Required</ErrorValidation>}
           </div>
         </div>
       </form>

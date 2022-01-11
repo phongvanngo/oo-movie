@@ -1,4 +1,6 @@
 import firebase from 'firebase/compat/app';
+import { useAppDispatch } from 'redux/hooks';
+import { updateUserHistory } from 'redux/reducer/userHistory';
 import { auth } from '../../config/firebase';
 
 export const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) =>

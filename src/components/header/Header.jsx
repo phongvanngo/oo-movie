@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
+import { updateUserHistory } from 'redux/reducer/userHistory';
 import logo from '../../assets/tmovie.png';
 import './header.scss';
 
@@ -14,12 +15,17 @@ const Header = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
 
-  console.log('log from header', globalUserState);
-
   const HeaderSignOut = () => {
     SignOut();
+    // dispatch(updateUserHistory({}));
+    clearLocalStorage();
     dispatch(setCurrentUser(null));
     history.push('/');
+  };
+
+  const clearLocalStorage = () => {
+    localStorage.removeItem('ootoken');
+    localStorage.removeItem('user');
   };
 
   const DropDownHeader = () => (
@@ -72,7 +78,7 @@ const Header = () => {
       <div className="header__wrap container">
         <div className="logo">
           <img src={logo} alt="" />
-          <Link to="/">tMovies</Link>
+          <Link to="/">NightMovies</Link>
         </div>
         <ul className="header__nav">
           {headerNav.map((e, i) => {

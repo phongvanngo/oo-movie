@@ -1,26 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router';
-
-import tmdbApi from '../../api/tmdbApi';
-import apiConfig from '../../api/apiConfig';
-
-import './detail.scss';
-import CastList from './CastList';
-import VideoList from './VideoList';
-
-import MovieList from '../../components/movie-list/MovieList';
-import VideoPlayer from 'components/videoplayer';
+import movieApi from 'api/oomovie/movieApi';
+import userCommentApi from 'api/oomovie/userCommentApi';
 import Button, { OutlineButton } from 'components/button/Button';
-import Modal, { ModalContent, ModalWithButton } from 'components/modal/Modal';
+import Comments from 'components/comments';
+import Modal, { ModalWithButton } from 'components/modal/Modal';
+import { MovieModelMapPattern } from 'interfaces/MovideDetail';
+import { getListComments } from 'module/comment/commentModule';
+import React, { useEffect, useRef, useState } from 'react';
+import { useHistory, useLocation, useParams } from 'react-router';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
+import { setLoading } from 'redux/reducer/loader';
+import { selectorUserHistory } from 'redux/reducer/userHistory';
+import { filterDisplayComments } from 'utils/comment';
+import { MapVariable } from 'utils/MapVariables';
+import apiConfig from '../../api/apiConfig';
+import tmdbApi from '../../api/tmdbApi';
+import MovieList from '../../components/movie-list/MovieList';
+import CastList from './CastList';
+import './detail.scss';
+import VideoList from './VideoList';
 
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
 
+  const userHistory = useAppSelector(selectorUserHistory);
+
+  const dispatch = useAppDispatch();
+
   let history = useHistory();
 
   const location = useLocation();
+
+  const [listComments, setListComments] = useState([]);
 
   const setModalVisible = () => {
     const modal = document.querySelector(`#PaymentNotification`);
@@ -30,31 +43,70 @@ const Detail = () => {
   };
 
   const handleWatchMovieEvent = () => {
-    if (false) {
-      pushToMovie();
+    const isLegalToWatch = CheckIfLegal(userHistory);
+
+    if (isLegalToWatch) {
+      pushToMovie(location.pathname);
     } else {
       setModalVisible();
     }
   };
 
-  const pushToMovie = () => {
-    history.push('/movie/524434/watching');
+  const CheckIfLegal = (user) => {
+    if (user.isBoughtPlan) {
+      return true;
+    }
+
+    const listMovies = user.boughtMovies;
+    if (listMovies.length > 0) {
+      const isMovieBought = listMovies.some((movie) => movie.id === item.id);
+      return isMovieBought;
+    }
+
+    return false;
+  };
+
+  const pushToMovie = (path) => {
+    history.push({ pathname: `${path}/watch`, search: '?episode=' });
   };
 
   const pushToCheckout = () => {
-    history.push({
-      pathname: '/checkout',
-      state: item,
-    });
+    let MovieOrTV = 'movie';
+    if (item.number_of_episodes) {
+      MovieOrTV = 'tv';
+    }
+    let selectedItem = {
+      isPlan: false,
+      MovieOrTv: MovieOrTV,
+      item: { ...item, price: 50 },
+    };
+    localStorage.setItem('selectedItem', JSON.stringify(selectedItem));
+    history.push('/checkout');
   };
 
   useEffect(() => {
     const getDetail = async () => {
-      const response = await tmdbApi.detail(category, id, { params: {} });
-      setItem(response);
+      let movieDetail = null;
+      try {
+        let response = await movieApi.getMovieDetail({ params: { id: id } });
+        movieDetail = MapVariable(response.data, MovieModelMapPattern);
+      } catch (error) {
+        movieDetail = await tmdbApi.detail(category, id, { params: {} });
+      }
+      setItem(movieDetail);
+
+      console.log('movie detail ne', movieDetail);
       window.scrollTo(0, 0);
     };
-    getDetail();
+
+    getListComments(id).then((data) => {
+      const displayComments = filterDisplayComments(data);
+      setListComments(displayComments);
+    });
+    dispatch(setLoading(true));
+    getDetail().finally(() => {
+      dispatch(setLoading(false));
+    });
   }, [category, id]);
 
   return (
@@ -103,29 +155,46 @@ const Detail = () => {
               </div>
             </div>
           </div>
+
           <div className="container">
-            <div className="section mb-3">
-              <VideoList id={item.id} />
-            </div>
-            <div className="section mb-3">
-              <div className="section__header mb-2">
-                <h2>Similar</h2>
+            <div className="flex flex__content">
+              <div className="w-3/4 flex__content__column">
+                <div className="section mb-3">
+                  <VideoList id={item.id} />
+                </div>
+                <div className="section mb-3">
+                  <div className="mb-4 text-lg">Comments</div>
+                  <Comments comments={listComments} movieID={item.id} />
+                </div>
               </div>
-              <MovieList category={category} type="similar" id={item.id} />
+              <div className="w-1/5  flex__content__column">
+                <div className="section mb-3">
+                  <div className="section__header mb-2">
+                    <h2>Similar</h2>
+                  </div>
+                  <MovieList
+                    category={category}
+                    isVertical={true}
+                    type="similar"
+                    id={item.id}
+                  />
+                </div>
+              </div>
             </div>
           </div>
+
           <Modal active={false} id="PaymentNotification">
             {/* @ts-ignore */}
             <ModalWithButton
-              onOk={pushToCheckout}
-              onAbort={() => {}}
-              okContent="Purchase"
-              abortContent="Later"
+              onOk={() => history.push('/plan')}
+              onAbort={pushToCheckout}
+              okContent="Subscribe a plan"
+              abortContent="Buy movie"
             >
               <div className="flex justify-center items-center text-xl text-center">
                 <div>
-                  You dont have permission to watch this movie. Buy it or
-                  Subscribe a plan
+                  You dont have permission to watch this movie.
+                  <div>Buy it or Subscribe a plan</div>
                 </div>
               </div>
             </ModalWithButton>

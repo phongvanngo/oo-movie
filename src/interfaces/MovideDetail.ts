@@ -50,21 +50,15 @@ export interface MovieDetail {
 }
 
 // ======== Comment interfaces==========
-export interface ICommentChild {
-  id: number;
-  text: string;
-  author: string;
-}
 
-export interface IComment {
-  id: number;
-  text: string;
-  author: string;
-  children?: ICommentChild[];
-}
-
-export interface ICommentData {
-  title?: string;
-  author?: string;
-  comments?: IComment[] | undefined;
-}
+export const MovieModelMapPattern = {
+  //   release_date: 'releaseDate',
+  //   releaseDate: 'release_date',
+  //   poster_path: 'posterPath',
+  //   posterPath: 'poster_path',
+  genres: 'genre_ids',
+  genre_ids: 'genres',
+  //   original_title: 'originalTitle',
+  //   originalTitle: 'original_title',
+  back_drop_path: 'backdrop_path',
+};

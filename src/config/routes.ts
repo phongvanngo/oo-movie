@@ -78,7 +78,7 @@ const routes: IRoute[] = [
     protected: true,
   },
   {
-    path: '/:category/:id/watching',
+    path: '/:category/:id/watch',
     exact: false,
     component: Theater,
     isProfile: false,
@@ -145,10 +145,5 @@ export const linkDropDown = [
     id: 1,
     name: 'Profile',
     path: '/profile',
-  },
-  {
-    id: 2,
-    name: 'Cart',
-    path: '/cart',
   },
 ];
