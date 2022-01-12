@@ -2,6 +2,7 @@ import { SignOut } from 'module/auth';
 import React, { ReactChildren, ReactElement, ReactNode } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
 import backgroundImage from 'testimage/captain.jpg';
@@ -51,6 +52,7 @@ export default function ProfileLayout({
   const LogOut = () => {
     SignOut();
     dispatch(setCurrentUser(null));
+    toast('Sign out successfully!');
     clearLocalStorage();
     history.push('/');
   };

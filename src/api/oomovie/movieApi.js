@@ -26,6 +26,11 @@ const movieApi = {
     const url = 'genres';
     return axiosClient.get(url, params);
   },
+
+  rateMovie: (data, params) => {
+    const url = 'movie/rating';
+    return axiosClient.post(url, data, params);
+  },
 };
 
 export default movieApi;

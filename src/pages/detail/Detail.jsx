@@ -19,6 +19,9 @@ import MovieList from '../../components/movie-list/MovieList';
 import CastList from './CastList';
 import './detail.scss';
 import VideoList from './VideoList';
+import Rate from 'rc-rate';
+import 'rc-rate/assets/index.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Detail = () => {
   const { category, id } = useParams();
@@ -90,6 +93,20 @@ const Detail = () => {
     history.push('/checkout');
   };
 
+  const rateMovie = async (value) => {
+    toast(`You just voted ${value} stars!`);
+    try {
+      const data = {
+        movie_id: id,
+        value: value,
+      };
+      const response = await movieApi.rateMovie(data);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     const getDetail = async () => {
       let movieDetail = null;
@@ -137,6 +154,15 @@ const Detail = () => {
                   )})`,
                 }}
               ></div>
+              <div className="movie-content__poster__rating">
+                <div className="text-lg mr-2">Rating: </div>
+                <Rate
+                  style={{ fontSize: '25px' }}
+                  defaultValue={item?.vote_average}
+                  onChange={rateMovie}
+                  allowClear={false}
+                />
+              </div>
             </div>
             <div className="movie-content__info">
               <h1 className="title">{item.title || item.name}</h1>

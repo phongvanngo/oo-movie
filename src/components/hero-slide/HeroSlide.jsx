@@ -25,7 +25,6 @@ const HeroSlide = () => {
 
   useEffect(() => {
     const getMovies = async () => {
-      const params = { page: 1 };
       try {
         const response = await movieApi.getAll({});
 
@@ -80,7 +79,9 @@ const HeroSlideItem = (props) => {
   const setModalActive = async () => {
     const modal = document.querySelector(`#modal_${item.id}`);
 
-    const videos = await tmdbApi.getVideos(category.movie, item.movie_id_fake);
+    const movieOrTv = item?.is_tv_series ? category.tv : category.movie;
+
+    const videos = await tmdbApi.getVideos(movieOrTv, item.movie_id_fake);
 
     if (videos.results.length > 0) {
       const videSrc = 'https://www.youtube.com/embed/' + videos.results[0].key;

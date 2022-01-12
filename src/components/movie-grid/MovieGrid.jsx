@@ -76,31 +76,24 @@ const MovieGrid = (props) => {
     const getList = async () => {
       let listGenres = null;
       let newMovies = null;
+      const params = {};
+
+      const reponseNewMovies = await movieApi.getAll({ params });
+      newMovies = filterMoviesByTrue(reponseNewMovies.data);
 
       if (keyword === undefined) {
-        const params = {};
-        const reponseNewMovies = await movieApi.getAll({ params });
-        newMovies = filterMoviesByTrue(reponseNewMovies.data);
-
         const responseGenres = await movieApi.getListGenres({ params });
         listGenres = filterGenresTrue(responseGenres?.data);
       } else {
-        const params = {
-          query: keyword,
-        };
-
-        const reponseNewMovies = await movieApi.getAll({ params });
-        newMovies = searchMovies(reponseNewMovies.data, keyword);
+        newMovies = searchMovies(newMovies, keyword);
       }
 
       newMovies = mapMoviesByType(newMovies, props.category);
-
+      console.log(newMovies);
       setItems(newMovies);
       listItemsToFilter.current = newMovies;
 
       addAttributeCategory(listGenres, setCategories);
-
-      //   setTotalPage(responseMovies.total_pages);
     };
     getList().finally(() => {
       dispatch(setLoading(false));
@@ -181,6 +174,7 @@ const MovieGrid = (props) => {
         {items.map((item, i) => (
           <MovieCard category={props.category} item={item} key={i} />
         ))}
+        {/* {items && items.length === 0 && 'No movies found'} */}
       </div>
       {page < totalPage ? (
         <div className="movie-grid__loadmore">

@@ -2,6 +2,7 @@ import { headerNav, linkDropDown } from 'config/routes';
 import { SignOut } from 'module/auth';
 import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
 import { updateUserHistory } from 'redux/reducer/userHistory';
@@ -21,7 +22,7 @@ const Header = () => {
     // dispatch(updateUserHistory({}));
     clearLocalStorage();
     dispatch(setCurrentUser(null));
-
+    toast('Sign out successfully!');
     history.push('/');
   };
 

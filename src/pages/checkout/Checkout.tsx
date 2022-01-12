@@ -224,6 +224,7 @@ export default function Checkout({}: Props): ReactElement {
           </div>
         </ModalWithButton>
       </Modal>
+      ,
     </>
   );
 }
