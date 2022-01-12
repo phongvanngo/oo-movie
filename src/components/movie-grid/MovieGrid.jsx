@@ -44,24 +44,20 @@ const MovieGrid = (props) => {
   };
 
   //   Trigger moi khi danh sach category active thay doi (items)
-  const FilterList = (items) => {
+  const FilterList = (refItems) => {
     //   Truong hop khong co category nao dc filter thi chuyen thanh all
-    let newListItems = [...items];
+    let newListItems = [...refItems];
     if (activeCategories.length === 0) {
       setItems(newListItems);
     } else {
-      newListItems = items.filter((item) => {
+      newListItems = refItems.filter((item) => {
         // Voi 1 phim, xet toan bo category dc chon.
         // Doi voi moi category dc chon, select some in movies category.
         let isContains = activeCategories.some((activeCate) => {
-          if (item?.isMine) {
-            return item.genre_ids.some((genre) => {
-              const isAlike = genre.name.indexOf(activeCate.name);
-              return genre.name === activeCate.name || isAlike >= 0;
-            });
-          } else {
-            return item.genre_ids.some((genre) => genre === activeCate.id);
-          }
+          return item.genres.some((genre) => {
+            // const isAlike = genre.name.indexOf(activeCate.name);
+            return genre.id === activeCate.id;
+          });
         });
         return isContains;
       });
@@ -78,7 +74,6 @@ const MovieGrid = (props) => {
   useEffect(() => {
     dispatch(setLoading(true));
     const getList = async () => {
-      let responseMovies = null;
       let listGenres = null;
       let newMovies = null;
 
@@ -89,32 +84,10 @@ const MovieGrid = (props) => {
 
         const responseGenres = await movieApi.getListGenres({ params });
         listGenres = filterGenresTrue(responseGenres?.data);
-
-        // switch (props.category) {
-        //   case category.movie:
-        //     responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
-        //       params,
-        //     });
-
-        //     responseCategories = await tmdbApi.getGenreList(category.movie, {
-        //       params,
-        //     });
-
-        //     break;
-        //   default:
-        //     responseMovies = await tmdbApi.getTvList(tvType.popular, {
-        //       params,
-        //     });
-
-        //     responseCategories = await tmdbApi.getGenreList(category.tv, {
-        //       params,
-        //     });
-        // }
       } else {
         const params = {
           query: keyword,
         };
-        responseMovies = await tmdbApi.search(props.category, { params });
 
         const reponseNewMovies = await movieApi.getAll({ params });
         newMovies = searchMovies(reponseNewMovies.data, keyword);
@@ -123,10 +96,7 @@ const MovieGrid = (props) => {
       newMovies = mapMoviesByType(newMovies, props.category);
 
       setItems(newMovies);
-
-      if (!keyword) {
-        listItemsToFilter.current = newMovies;
-      }
+      listItemsToFilter.current = newMovies;
 
       addAttributeCategory(listGenres, setCategories);
 
@@ -196,6 +166,7 @@ const MovieGrid = (props) => {
                   <OutlineButtonToggle
                     onClick={FilterCategory}
                     isActive={cate.is_selected}
+                    cateItem={cate}
                     className="small btn-float-from-left"
                   >
                     {cate.name}
@@ -213,7 +184,7 @@ const MovieGrid = (props) => {
       </div>
       {page < totalPage ? (
         <div className="movie-grid__loadmore">
-          <OutlineButton className="small" onClick={loadMore}>
+          <OutlineButton className="small" onClick={() => {}}>
             Load more
           </OutlineButton>
         </div>

@@ -28,9 +28,7 @@ const HeroSlide = () => {
       const params = { page: 1 };
       try {
         const response = await movieApi.getAll({});
-        // const response = await tmdbApi.getMoviesList(movieType.popular, {
-        //   params,
-        // });
+
         const filterdMovies = filterMoviesByTrue(response.data);
         setMovieItems(filterdMovies.slice(1, 5));
       } catch {

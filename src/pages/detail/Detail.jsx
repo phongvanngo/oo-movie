@@ -95,7 +95,7 @@ const Detail = () => {
       let movieDetail = null;
       try {
         let response = await movieApi.getMovieDetail({ params: { id: id } });
-        movieDetail = MapVariable(response.data, MovieModelMapPattern);
+        movieDetail = response.data;
       } catch (error) {
         movieDetail = await tmdbApi.detail(category, id, { params: {} });
       }
