@@ -69,3 +69,11 @@ export const clearSelectedCategories = (
   setActiveCategories([]);
   setCategories(newCategories);
 };
+
+export const filterGenresTrue = (listGenres: FixMeLater) => {
+  if (listGenres) {
+    return listGenres.filter((genre: FixMeLater) => genre.enabled === true);
+  } else {
+    return [];
+  }
+};

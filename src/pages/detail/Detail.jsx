@@ -35,6 +35,8 @@ const Detail = () => {
 
   const [listComments, setListComments] = useState([]);
 
+  const trailerSection = useRef();
+
   const setModalVisible = () => {
     const modal = document.querySelector(`#PaymentNotification`);
     if (modal) {
@@ -52,13 +54,17 @@ const Detail = () => {
     }
   };
 
+  const handleWatchTrailer = () => {
+    trailerSection.current?.scrollIntoView();
+  };
+
   const CheckIfLegal = (user) => {
     if (user.isBoughtPlan) {
       return true;
     }
 
-    const listMovies = user.boughtMovies;
-    if (listMovies.length > 0) {
+    const listMovies = user?.boughtMovies;
+    if (listMovies && listMovies.length > 0) {
       const isMovieBought = listMovies.some((movie) => movie.id === item.id);
       return isMovieBought;
     }
@@ -147,11 +153,13 @@ const Detail = () => {
                 <div className="section__header">
                   <h2>Casts</h2>
                 </div>
-                <CastList id={item.id} />
+                <CastList id={item.id} idNew={item.movie_id_fake} />
               </div>
               <div className="btns">
                 <Button onClick={handleWatchMovieEvent}>Watch now</Button>
-                <OutlineButton>Watch Trailer</OutlineButton>
+                <OutlineButton onClick={handleWatchTrailer}>
+                  Watch Trailer
+                </OutlineButton>
               </div>
             </div>
           </div>
@@ -159,8 +167,8 @@ const Detail = () => {
           <div className="container">
             <div className="flex flex__content">
               <div className="w-3/4 flex__content__column">
-                <div className="section mb-3">
-                  <VideoList id={item.id} />
+                <div className="section mb-3" ref={trailerSection}>
+                  <VideoList id={item.id} idNew={item.movie_id_fake} />
                 </div>
                 <div className="section mb-3">
                   <div className="mb-4 text-lg">Comments</div>
@@ -181,6 +189,7 @@ const Detail = () => {
                     isVertical={true}
                     type="similar"
                     id={item.id}
+                    idNew={item.movie_id_fake}
                   />
                 </div>
               </div>

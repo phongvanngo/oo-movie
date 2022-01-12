@@ -89,7 +89,7 @@ const Header = () => {
                         i === active ? 'active' : ''
                       } header__profile`}
                     >
-                      <Link to="#" className=" ">
+                      <Link to="/profile" className=" ">
                         {globalUserState.displayName}
                       </Link>
                       <DropDownHeader />

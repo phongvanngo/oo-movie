@@ -2,7 +2,7 @@ import movieApi from 'api/oomovie/movieApi';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { mergeMovieLists } from 'utils/Movie';
+import { filterMoviesByTrue, mergeMovieLists } from 'utils/Movie';
 import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
 import { OutlineButton, OutlineButtonToggle } from '../button/Button';
 import MovieCard from '../movie-card/MovieCard';
@@ -13,6 +13,7 @@ import {
   addAttributeCategory,
   updateDisplayCategories,
   clearSelectedCategories,
+  filterGenresTrue,
 } from 'utils/Category';
 import { useAppDispatch } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
@@ -78,34 +79,37 @@ const MovieGrid = (props) => {
     dispatch(setLoading(true));
     const getList = async () => {
       let responseMovies = null;
-      let responseCategories = null;
+      let listGenres = null;
       let newMovies = null;
 
       if (keyword === undefined) {
         const params = {};
         const reponseNewMovies = await movieApi.getAll({ params });
-        newMovies = reponseNewMovies.data;
+        newMovies = filterMoviesByTrue(reponseNewMovies.data);
 
-        switch (props.category) {
-          case category.movie:
-            responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
-              params,
-            });
+        const responseGenres = await movieApi.getListGenres({ params });
+        listGenres = filterGenresTrue(responseGenres?.data);
 
-            responseCategories = await tmdbApi.getGenreList(category.movie, {
-              params,
-            });
+        // switch (props.category) {
+        //   case category.movie:
+        //     responseMovies = await tmdbApi.getMoviesList(movieType.upcoming, {
+        //       params,
+        //     });
 
-            break;
-          default:
-            responseMovies = await tmdbApi.getTvList(tvType.popular, {
-              params,
-            });
+        //     responseCategories = await tmdbApi.getGenreList(category.movie, {
+        //       params,
+        //     });
 
-            responseCategories = await tmdbApi.getGenreList(category.tv, {
-              params,
-            });
-        }
+        //     break;
+        //   default:
+        //     responseMovies = await tmdbApi.getTvList(tvType.popular, {
+        //       params,
+        //     });
+
+        //     responseCategories = await tmdbApi.getGenreList(category.tv, {
+        //       params,
+        //     });
+        // }
       } else {
         const params = {
           query: keyword,
@@ -118,16 +122,15 @@ const MovieGrid = (props) => {
 
       newMovies = mapMoviesByType(newMovies, props.category);
 
-      const listItems = mergeMovieLists(responseMovies.results, newMovies);
-      setItems(listItems);
+      setItems(newMovies);
 
       if (!keyword) {
-        listItemsToFilter.current = listItems;
+        listItemsToFilter.current = newMovies;
       }
 
-      addAttributeCategory(responseCategories?.genres, setCategories);
+      addAttributeCategory(listGenres, setCategories);
 
-      setTotalPage(responseMovies.total_pages);
+      //   setTotalPage(responseMovies.total_pages);
     };
     getList().finally(() => {
       dispatch(setLoading(false));

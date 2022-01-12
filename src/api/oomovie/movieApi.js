@@ -21,6 +21,11 @@ const movieApi = {
     const url = 'download';
     return axiosClient.get(url, params);
   },
+
+  getListGenres: (params) => {
+    const url = 'genres';
+    return axiosClient.get(url, params);
+  },
 };
 
 export default movieApi;
