@@ -6,25 +6,41 @@ import { SwiperSlide, Swiper } from 'swiper/react';
 
 import './movie-slide.scss';
 import { selectorUserHistory } from 'redux/reducer/userHistory';
-import { useAppSelector } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import checkoutApi from 'api/oomovie/checkoutApi';
+import { Movie } from 'interfaces/Order';
+import { setLoading } from 'redux/reducer/loader';
 
 interface Props {}
 
 export default function MyMovies({}: Props): ReactElement {
   const [items, setItems] = useState([]);
 
-  const userData = useAppSelector(selectorUserHistory);
+  const [purchasedItems, setPurchasedItems] = useState<FixMeLater>([]);
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const getList = async () => {
-      let response: FixMeLater = null;
+      let listMovies: FixMeLater = null;
       const params = {};
+      try {
+        listMovies = await tmdbApi.getMoviesList(movieType.popular, { params });
+        setItems(listMovies.results);
 
-      response = await tmdbApi.getMoviesList(movieType.popular, { params });
-
-      setItems(response.results);
+        const purchasedItems: FixMeLater = await checkoutApi.getPurchasedMovies(
+          {}
+        );
+        setPurchasedItems(purchasedItems?.data);
+        console.log('data me', purchasedItems);
+      } catch (error) {
+        console.log(error);
+      }
     };
-    getList();
+    dispatch(setLoading(true));
+    getList().finally(() => {
+      dispatch(setLoading(false));
+    });
   }, []);
 
   return (
@@ -52,15 +68,14 @@ export default function MyMovies({}: Props): ReactElement {
 
       <div className="font-semibold mb-4 text-lg">My movies</div>
       <div className="grid grid-cols-4 gap-3">
-        {userData?.boughtMovies &&
-          userData?.boughtMovies.map((item: any, i: any) => (
+        {purchasedItems &&
+          purchasedItems.length > 0 &&
+          purchasedItems.map((item: any, i: any) => (
             <div className="w-44" key={i}>
               <MovieCard
                 key={i}
                 item={item}
-                category={
-                  item.number_of_episodes ? category.tv : category.movie
-                }
+                category={item.is_tv_series ? category.tv : category.movie}
               />
             </div>
           ))}

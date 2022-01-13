@@ -1,11 +1,23 @@
+import checkoutApi from 'api/oomovie/checkoutApi';
+import movieApi from 'api/oomovie/movieApi';
+import { FixMeLater } from 'interfaces/Migrate';
 import { SignOut } from 'module/auth';
-import React, { ReactChildren, ReactElement, ReactNode } from 'react';
+import React, {
+  ReactChildren,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
+import { setLoading } from 'redux/reducer/loader';
 import backgroundImage from 'testimage/captain.jpg';
+import { numberToDate } from 'utils/commonConvert';
 import { clearLocalStorage } from 'utils/localstorage';
 import './profile-layout.scss';
 
@@ -49,6 +61,8 @@ export default function ProfileLayout({
   const dispatch = useAppDispatch();
   const userAuth = useAppSelector(selectorUser);
 
+  const [currentPlan, setCurrentPlan] = useState<FixMeLater>();
+
   const LogOut = () => {
     SignOut();
     dispatch(setCurrentUser(null));
@@ -56,6 +70,25 @@ export default function ProfileLayout({
     clearLocalStorage();
     history.push('/');
   };
+
+  const parsedTime = numberToDate(currentPlan?.expired_in);
+
+  useEffect(() => {
+    const getPurchasedPlan = async () => {
+      const purchasedPlan = localStorage.getItem('purchasedPlan');
+      if (!purchasedPlan) {
+        try {
+          const reponse: FixMeLater = await checkoutApi.getPurcasedPlan({});
+          console.log(reponse?.data);
+          setCurrentPlan(reponse?.data);
+          localStorage.setItem('purchasedPlan', JSON.stringify(reponse?.data));
+        } catch (error) {}
+      } else {
+        setCurrentPlan(JSON.parse(purchasedPlan));
+      }
+    };
+    getPurchasedPlan();
+  }, []);
 
   return (
     <>
@@ -102,15 +135,16 @@ export default function ProfileLayout({
         <div className="profile__main">
           <div className="profile__main__notification">
             <div>Welcome back {userAuth?.displayName}!</div>
-            <div>Your last movie is ....</div>
+            <div>
+              Current plan:{' '}
+              {currentPlan?.plan?.title ? currentPlan?.plan?.title : 'None'}
+            </div>
+            <div>Expired date: {parsedTime ? parsedTime : 'None'}</div>
           </div>
           <div className="profile__main__content">
             <div className="p-4">{children}</div>
           </div>
         </div>
-
-        {/* Tablet */}
-        {/* <div>Icon tablet</div> */}
       </div>
     </>
   );

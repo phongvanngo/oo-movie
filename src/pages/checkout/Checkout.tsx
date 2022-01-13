@@ -13,6 +13,7 @@ import { useAppDispatch } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
 import './checkout.scss';
 import PaymentCard from './PaymentCard';
+import { ImCancelCircle } from 'react-icons/im';
 
 interface Props {
   //   location: RouteComponentProps;
@@ -48,14 +49,24 @@ export default function Checkout({}: Props): ReactElement {
 
   const form = useForm<Inputs>();
 
+  const modal = {
+    success: 'PaymentNotification',
+    failure: 'ErrorInformation',
+  };
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     dispatch(setLoading(true));
 
-    createOrder(itemPurchasing, promotionState).then((data) => {
-      setModalVisible();
-
-      dispatch(setLoading(false));
-    });
+    createOrder(itemPurchasing, promotionState)
+      .then((data) => {
+        setModalVisible(modal.success);
+      })
+      .catch((error) => {
+        setModalVisible(modal.failure);
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
   };
 
   //   ======== Component did mout ==============
@@ -71,8 +82,8 @@ export default function Checkout({}: Props): ReactElement {
   }, []);
   // +========== End use effect here ==========
 
-  const setModalVisible = () => {
-    const modal = document.querySelector(`#PaymentNotification`);
+  const setModalVisible = (value: String) => {
+    const modal = document.querySelector(`#${value}`);
     if (modal) {
       modal.classList.toggle('active');
     }
@@ -209,7 +220,29 @@ export default function Checkout({}: Props): ReactElement {
           </div>
         </ModalWithButton>
       </Modal>
-      ,
+      {/* @ts-ignore */}
+      <Modal active={false} id="ErrorInformation">
+        {/* @ts-ignore */}
+        <ModalWithButton
+          onOk={() => history.push('/profile')}
+          okContent="View profile"
+        >
+          <div className="flex justify-center items-center text-xl text-center">
+            <div>
+              <span>
+                <ImCancelCircle
+                  style={{
+                    display: 'inline-block',
+                    color: 'red',
+                    marginRight: '10px',
+                  }}
+                />
+              </span>
+              <span>Purchase failed! You have already subscribed a plan.</span>
+            </div>
+          </div>
+        </ModalWithButton>
+      </Modal>
     </>
   );
 }
