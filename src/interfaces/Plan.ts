@@ -3,5 +3,6 @@ export interface IPLan {
   title: string;
   price: number;
   enabled: boolean;
+  description?: string;
   custom_title?: string;
 }

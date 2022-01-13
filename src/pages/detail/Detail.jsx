@@ -1,34 +1,28 @@
 import movieApi from 'api/oomovie/movieApi';
-import userCommentApi from 'api/oomovie/userCommentApi';
 import Button, { OutlineButton } from 'components/button/Button';
 import Comments from 'components/comments';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
-import { MovieModelMapPattern } from 'interfaces/MovideDetail';
 import { getListComments } from 'module/comment/commentModule';
+import Rate from 'rc-rate';
+import 'rc-rate/assets/index.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser } from 'redux/reducer/authenticateSlice';
 import { setLoading } from 'redux/reducer/loader';
-import { selectorUserHistory } from 'redux/reducer/userHistory';
 import { filterDisplayComments } from 'utils/comment';
-import { MapVariable } from 'utils/MapVariables';
 import apiConfig from '../../api/apiConfig';
 import tmdbApi from '../../api/tmdbApi';
 import MovieList from '../../components/movie-list/MovieList';
 import CastList from './CastList';
 import './detail.scss';
 import VideoList from './VideoList';
-import Rate from 'rc-rate';
-import 'rc-rate/assets/index.css';
-import { ToastContainer, toast } from 'react-toastify';
 
 const Detail = () => {
   const { category, id } = useParams();
 
   const [item, setItem] = useState(null);
-
-  const userHistory = useAppSelector(selectorUserHistory);
 
   const dispatch = useAppDispatch();
 
@@ -40,6 +34,8 @@ const Detail = () => {
 
   const trailerSection = useRef();
 
+  const userAuth = useAppSelector(selectorUser);
+
   const setModalVisible = () => {
     const modal = document.querySelector(`#PaymentNotification`);
     if (modal) {
@@ -47,32 +43,33 @@ const Detail = () => {
     }
   };
 
-  const handleWatchMovieEvent = () => {
-    const isLegalToWatch = CheckIfLegal(userHistory);
-
+  const handleWatchMovieEvent = async () => {
+    dispatch(setLoading(true));
+    const isLegalToWatch = await CheckIfLegal();
     if (isLegalToWatch) {
       pushToMovie(location.pathname);
     } else {
       setModalVisible();
     }
+    dispatch(setLoading(false));
   };
 
   const handleWatchTrailer = () => {
     trailerSection.current?.scrollIntoView();
   };
 
-  const CheckIfLegal = (user) => {
-    if (user.isBoughtPlan) {
-      return true;
+  const CheckIfLegal = async () => {
+    try {
+      const isEligble = await movieApi.checkIfEligible({
+        params: {
+          movie_id: id,
+        },
+      });
+      console.log(isEligble);
+      return isEligble.data;
+    } catch (error) {
+      return false;
     }
-
-    const listMovies = user?.boughtMovies;
-    if (listMovies && listMovies.length > 0) {
-      const isMovieBought = listMovies.some((movie) => movie.id === item.id);
-      return isMovieBought;
-    }
-
-    return false;
   };
 
   const pushToMovie = (path) => {
@@ -95,15 +92,16 @@ const Detail = () => {
 
   const rateMovie = async (value) => {
     toast(`You just voted ${value} stars!`);
-    try {
-      const data = {
-        movie_id: id,
-        value: value,
-      };
-      const response = await movieApi.rateMovie(data);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
+    if (userAuth) {
+      try {
+        const data = {
+          movie_id: id,
+          value: value,
+        };
+        const response = await movieApi.rateMovie(data);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 

@@ -31,6 +31,11 @@ const movieApi = {
     const url = 'movie/rating';
     return axiosClient.post(url, data, params);
   },
+
+  checkIfEligible: (params) => {
+    const url = 'movie/eligible';
+    return axiosClient.get(url, params);
+  },
 };
 
 export default movieApi;

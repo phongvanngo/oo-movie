@@ -77,31 +77,10 @@ export default function LoginPage({}: Props): ReactElement {
         registerAndSignIn(user);
 
         dispatch(setCurrentUser(user));
-        LocalStorageHandle(user);
       })
       .catch((error) => {
         setError(error.message);
       });
-  };
-
-  const LocalStorageHandle = (user: FixMeLater) => {
-    // localStorage.setItem('rememberMe', rememberMe);
-    // localStorage.getItem('rememberMe')
-    let thisUser = localStorage.getItem(user.email);
-
-    if (thisUser) {
-      dispatch(updateUserHistory(JSON.parse(thisUser)));
-    } else {
-      const thisUserEmail = user.email;
-      const newUSer = {
-        email: thisUserEmail,
-        isBoughtPlan: false,
-        boughtMovies: [],
-        historyMovies: [],
-        bills: [],
-      };
-      dispatch(updateUserHistory(newUSer));
-    }
   };
 
   const mainref = useRef<HTMLHeadingElement>(null);

@@ -75,7 +75,7 @@ const routes: IRoute[] = [
     component: Catalog,
     isProfile: false,
     name: '',
-    protected: true,
+    protected: false,
   },
   {
     path: '/:category/:id/watch',

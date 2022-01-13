@@ -36,7 +36,7 @@ function App() {
       } else {
         console.log('No user detected');
       }
-      dispatch(setLoading(false));
+      //   dispatch(setLoading(false));
     });
   }, []);
 
@@ -78,6 +78,7 @@ function App() {
         <MessengerCustomerChat
           pageId="112104784691331"
           appId="256677786440177"
+          //   themeColor=""
         />
 
         <Footer />

@@ -1,9 +1,7 @@
 import { auth } from 'config/firebase';
 import { FixMeLater } from 'interfaces/Migrate';
-import ProfileLayout from 'layout/profile/ProfileLayout';
-import Profile from 'pages/profile/Profile';
-import React, { ReactElement, ReactNode } from 'react';
-import { Redirect, Route, RouteProps } from 'react-router';
+import React, { ReactElement } from 'react';
+import { Redirect, Route } from 'react-router';
 
 interface PrivateRouteProps {
   // rest: RouteProps;

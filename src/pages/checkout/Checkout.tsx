@@ -3,20 +3,14 @@ import Modal, { ModalWithButton } from 'components/modal/Modal';
 import PageHeader from 'components/page-header/PageHeader';
 import { DiscountInitialValue, IDiscount } from 'interfaces/Discount';
 import { FixMeLater } from 'interfaces/Migrate';
-import {
-  checkDiscountCode,
-  createOrder,
-  SaveCheckoutData,
-  UseDiscountCode,
-} from 'module/checkout/checkout';
+import { checkDiscountCode, createOrder } from 'module/checkout/checkout';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { useAppDispatch } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
-import { selectorUserHistory } from 'redux/reducer/userHistory';
 import './checkout.scss';
 import PaymentCard from './PaymentCard';
 
@@ -50,7 +44,6 @@ export default function Checkout({}: Props): ReactElement {
   const [promotionInput, setPromotionInput] = useState('');
   const [isValidCode, setIsValidCode] = useState(true);
 
-  const userHistory = useAppSelector(selectorUserHistory);
   const dispatch = useAppDispatch();
 
   const form = useForm<Inputs>();
@@ -59,14 +52,6 @@ export default function Checkout({}: Props): ReactElement {
     dispatch(setLoading(true));
 
     createOrder(itemPurchasing, promotionState).then((data) => {
-      SaveCheckoutData(
-        userHistory,
-        itemPurchasing,
-        promotionState,
-        total,
-        dispatch
-      );
-
       setModalVisible();
 
       dispatch(setLoading(false));

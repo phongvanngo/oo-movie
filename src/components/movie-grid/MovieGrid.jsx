@@ -1,22 +1,20 @@
 import movieApi from 'api/oomovie/movieApi';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router';
+import { useAppDispatch } from 'redux/hooks';
+import { setLoading } from 'redux/reducer/loader';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { filterMoviesByTrue, mergeMovieLists } from 'utils/Movie';
-import tmdbApi, { category, movieType, tvType } from '../../api/tmdbApi';
+import {
+  addAttributeCategory,
+  clearSelectedCategories,
+  filterGenresTrue,
+  updateDisplayCategories,
+} from 'utils/Category';
+import { filterMoviesByTrue, mapMoviesByType, searchMovies } from 'utils/Movie';
 import { OutlineButton, OutlineButtonToggle } from '../button/Button';
 import MovieCard from '../movie-card/MovieCard';
 import './movie-grid.scss';
 import MovieSearch from './MovieSearch';
-import { mapMoviesByType, searchMovies } from 'utils/Movie';
-import {
-  addAttributeCategory,
-  updateDisplayCategories,
-  clearSelectedCategories,
-  filterGenresTrue,
-} from 'utils/Category';
-import { useAppDispatch } from 'redux/hooks';
-import { setLoading } from 'redux/reducer/loader';
 
 const MovieGrid = (props) => {
   const [items, setItems] = useState([]);
@@ -66,11 +64,6 @@ const MovieGrid = (props) => {
     return newListItems;
   };
 
-  const UpdateLoadMoreItems = (newLoadItems) => {
-    const itemsFilterd = FilterList(newLoadItems);
-    setItems([...items, ...itemsFilterd]);
-  };
-
   useEffect(() => {
     dispatch(setLoading(true));
     const getList = async () => {
@@ -78,22 +71,25 @@ const MovieGrid = (props) => {
       let newMovies = null;
       const params = {};
 
-      const reponseNewMovies = await movieApi.getAll({ params });
-      newMovies = filterMoviesByTrue(reponseNewMovies.data);
+      try {
+        const reponseNewMovies = await movieApi.getAll({ params });
+        newMovies = filterMoviesByTrue(reponseNewMovies.data);
 
-      if (keyword === undefined) {
-        const responseGenres = await movieApi.getListGenres({ params });
-        listGenres = filterGenresTrue(responseGenres?.data);
-      } else {
-        newMovies = searchMovies(newMovies, keyword);
+        if (keyword === undefined) {
+          const responseGenres = await movieApi.getListGenres({ params });
+          listGenres = filterGenresTrue(responseGenres?.data);
+        } else {
+          newMovies = searchMovies(newMovies, keyword);
+        }
+        const moviesByType = mapMoviesByType(newMovies, props.category);
+        console.log(moviesByType);
+        setItems(moviesByType);
+        listItemsToFilter.current = moviesByType;
+
+        addAttributeCategory(listGenres, setCategories);
+      } catch (error) {
+        console.log(error);
       }
-
-      newMovies = mapMoviesByType(newMovies, props.category);
-      console.log(newMovies);
-      setItems(newMovies);
-      listItemsToFilter.current = newMovies;
-
-      addAttributeCategory(listGenres, setCategories);
     };
     getList().finally(() => {
       dispatch(setLoading(false));
@@ -105,32 +101,6 @@ const MovieGrid = (props) => {
       FilterList(listItemsToFilter.current);
     }
   }, [activeCategories]);
-
-  const loadMore = async () => {
-    let response = null;
-    if (keyword === undefined) {
-      const params = {
-        page: page + 1,
-      };
-      switch (props.category) {
-        case category.movie:
-          response = await tmdbApi.getMoviesList(movieType.upcoming, {
-            params,
-          });
-          break;
-        default:
-          response = await tmdbApi.getTvList(tvType.popular, { params });
-      }
-    } else {
-      const params = {
-        page: page + 1,
-        query: keyword,
-      };
-      response = await tmdbApi.search(props.category, { params });
-    }
-    UpdateLoadMoreItems(response.results);
-    setPage(page + 1);
-  };
 
   return (
     <>

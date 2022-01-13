@@ -2,12 +2,13 @@ import React, { ReactElement, useState } from 'react';
 import Comment from './CommentCard';
 import InputComment from './InputComment';
 import { leaveComment } from 'module/comment/commentModule';
-import { useAppDispatch } from 'redux/hooks';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
 import { IComment } from 'interfaces/Comment';
 import { FixMeLater } from 'interfaces/Migrate';
 import { useHistory } from 'react-router-dom';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
 
 interface Props {
   comments: IComment[] | null;
@@ -23,6 +24,7 @@ export default function Comments({
   const [commentValue, setCommentValue] = useState<string>('');
 
   const dispatch = useAppDispatch();
+  const userAuth = useAppSelector(selectorUser);
 
   const history = useHistory();
 
@@ -34,7 +36,17 @@ export default function Comments({
           setCommentValue('');
           if (comments) {
             let newListComments = [...comments];
-            newListComments.unshift(data);
+            let newdata = { ...data };
+            if (userAuth?.displayName !== data?.user.fullname) {
+              newdata = {
+                ...data,
+                user: {
+                  ...data?.user,
+                  fullname: userAuth?.displayName,
+                },
+              };
+            }
+            newListComments.unshift(newdata);
             updateComments(newListComments);
           }
         })
@@ -53,7 +65,6 @@ export default function Comments({
       modal.classList.toggle('active');
     }
   };
-
   return (
     <div>
       <InputComment
@@ -67,7 +78,7 @@ export default function Comments({
           comments.map((comment) => {
             return <Comment key={comment.id} comment={comment} />;
           })}
-        {!comments && <div>No one comments</div>}
+        {comments && comments.length <= 0 && <div>No one comments</div>}
       </div>
 
       {/* @ts-ignore */}

@@ -9,6 +9,7 @@ export const SignInWithSocialMedia = (provider: firebase.auth.AuthProvider) =>
       .signInWithPopup(provider)
       .then((result) => {
         resolve(result);
+        console.log(result);
       })
       .catch((error) => reject(error));
   });

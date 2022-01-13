@@ -11,7 +11,7 @@ interface Props {
 export default function OrderDetail({ order, user }: Props): ReactElement {
   const orderTime = numberToDate(order?.order_time as number);
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <div className="flex justify-center items-center text-xl font-semibold text-center mb-4">
         <div>Order detail #{order?.id.substring(0, 6)}</div>
       </div>
@@ -32,22 +32,30 @@ export default function OrderDetail({ order, user }: Props): ReactElement {
         <div className="flex-1"></div>
       </div>
       <div className="flex justify-center mt-4">
-        <div className="flex-1">
-          <div className="font-semibold text-center">Purchased Item</div>
-          {order?.is_plan && (
+        {order?.is_plan && (
+          <div className="flex-1">
+            <div className="font-semibold text-center">Purchased Item</div>
             <div className="mb-1.5">
               <span className="underline">Name:</span> {order?.plan.name}
             </div>
-          )}
-          {!order?.is_plan && (
+            <div className="mb-1.5">
+              <span className="underline">Price:</span> ${order?.plan.price}
+            </div>
+          </div>
+        )}
+
+        {!order?.is_plan && (
+          <div className="flex-1">
+            <div className="font-semibold text-center">Purchased Item</div>
             <div className="mb-1.5">
               <span className="underline">Name:</span> {order?.movies[0].name}
             </div>
-          )}
-          <div className="mb-1.5">
-            <span className="underline">Price:</span> {order?.total}
+            <div className="mb-1.5">
+              <span className="underline">Price:</span> $
+              {order?.movies[0].price}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex-1">
           <div className="font-semibold text-center">Discount</div>
@@ -63,8 +71,7 @@ export default function OrderDetail({ order, user }: Props): ReactElement {
       </div>
       <hr className="mt-2"></hr>
       <div className="self-end mt-2">
-        <div>Sub-total: 100</div>
-        <div>Total: {order?.total}</div>
+        <div className="text-xl font-semibold">Total: ${order?.total}</div>
       </div>
     </div>
   );
