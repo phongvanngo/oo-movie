@@ -18,12 +18,15 @@ export const userFromAPISlice = createSlice({
   reducers: {
     setUserFromAPI: (state, action: PayloadAction<FixMeLater>) => {
       state.value = action.payload;
+
+      //   const userID = action.payload?.id;
+      localStorage.setItem(`user`, JSON.stringify(action.payload));
     },
   },
 });
 
 export const { setUserFromAPI } = userFromAPISlice.actions;
 
-export const selectorUser = (state: RootState) => state.userFromApi.value;
+export const selectorUserApi = (state: RootState) => state.userFromApi.value;
 
 export default userFromAPISlice.reducer;

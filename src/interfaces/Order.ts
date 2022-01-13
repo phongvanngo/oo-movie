@@ -3,6 +3,7 @@ import { User } from './User';
 export interface Movie {
   id: string;
   name: string;
+  price?: number;
 }
 
 export interface Discount {

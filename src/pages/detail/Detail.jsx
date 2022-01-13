@@ -1,18 +1,17 @@
 import movieApi from 'api/oomovie/movieApi';
-import userCommentApi from 'api/oomovie/userCommentApi';
 import Button, { OutlineButton } from 'components/button/Button';
 import Comments from 'components/comments';
 import Modal, { ModalWithButton } from 'components/modal/Modal';
-import { MovieModelMapPattern } from 'interfaces/MovideDetail';
 import { getListComments } from 'module/comment/commentModule';
+import Rate from 'rc-rate';
+import 'rc-rate/assets/index.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router';
+import { toast } from 'react-toastify';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser } from 'redux/reducer/authenticateSlice';
 import { setLoading } from 'redux/reducer/loader';
-import { selectorUserHistory } from 'redux/reducer/userHistory';
 import { filterDisplayComments } from 'utils/comment';
-import { MapVariable } from 'utils/MapVariables';
 import apiConfig from '../../api/apiConfig';
 import tmdbApi from '../../api/tmdbApi';
 import MovieList from '../../components/movie-list/MovieList';
@@ -25,8 +24,6 @@ const Detail = () => {
 
   const [item, setItem] = useState(null);
 
-  const userHistory = useAppSelector(selectorUserHistory);
-
   const dispatch = useAppDispatch();
 
   let history = useHistory();
@@ -35,6 +32,10 @@ const Detail = () => {
 
   const [listComments, setListComments] = useState([]);
 
+  const trailerSection = useRef();
+
+  const userAuth = useAppSelector(selectorUser);
+
   const setModalVisible = () => {
     const modal = document.querySelector(`#PaymentNotification`);
     if (modal) {
@@ -42,28 +43,33 @@ const Detail = () => {
     }
   };
 
-  const handleWatchMovieEvent = () => {
-    const isLegalToWatch = CheckIfLegal(userHistory);
-
+  const handleWatchMovieEvent = async () => {
+    dispatch(setLoading(true));
+    const isLegalToWatch = await CheckIfLegal();
     if (isLegalToWatch) {
       pushToMovie(location.pathname);
     } else {
       setModalVisible();
     }
+    dispatch(setLoading(false));
   };
 
-  const CheckIfLegal = (user) => {
-    if (user.isBoughtPlan) {
-      return true;
-    }
+  const handleWatchTrailer = () => {
+    trailerSection.current?.scrollIntoView();
+  };
 
-    const listMovies = user.boughtMovies;
-    if (listMovies.length > 0) {
-      const isMovieBought = listMovies.some((movie) => movie.id === item.id);
-      return isMovieBought;
+  const CheckIfLegal = async () => {
+    try {
+      const isEligble = await movieApi.checkIfEligible({
+        params: {
+          movie_id: id,
+        },
+      });
+      console.log(isEligble);
+      return isEligble.data;
+    } catch (error) {
+      return false;
     }
-
-    return false;
   };
 
   const pushToMovie = (path) => {
@@ -84,12 +90,27 @@ const Detail = () => {
     history.push('/checkout');
   };
 
+  const rateMovie = async (value) => {
+    toast(`You just voted ${value} stars!`);
+    if (userAuth) {
+      try {
+        const data = {
+          movie_id: id,
+          value: value,
+        };
+        const response = await movieApi.rateMovie(data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   useEffect(() => {
     const getDetail = async () => {
       let movieDetail = null;
       try {
         let response = await movieApi.getMovieDetail({ params: { id: id } });
-        movieDetail = MapVariable(response.data, MovieModelMapPattern);
+        movieDetail = response.data;
       } catch (error) {
         movieDetail = await tmdbApi.detail(category, id, { params: {} });
       }
@@ -131,6 +152,15 @@ const Detail = () => {
                   )})`,
                 }}
               ></div>
+              <div className="movie-content__poster__rating">
+                <div className="text-lg mr-2">Rating: </div>
+                <Rate
+                  style={{ fontSize: '25px' }}
+                  defaultValue={item?.vote_average}
+                  onChange={rateMovie}
+                  allowClear={false}
+                />
+              </div>
             </div>
             <div className="movie-content__info">
               <h1 className="title">{item.title || item.name}</h1>
@@ -147,11 +177,13 @@ const Detail = () => {
                 <div className="section__header">
                   <h2>Casts</h2>
                 </div>
-                <CastList id={item.id} />
+                <CastList id={item.id} idNew={item.movie_id_fake} />
               </div>
               <div className="btns">
                 <Button onClick={handleWatchMovieEvent}>Watch now</Button>
-                <OutlineButton>Watch Trailer</OutlineButton>
+                <OutlineButton onClick={handleWatchTrailer}>
+                  Watch Trailer
+                </OutlineButton>
               </div>
             </div>
           </div>
@@ -159,12 +191,16 @@ const Detail = () => {
           <div className="container">
             <div className="flex flex__content">
               <div className="w-3/4 flex__content__column">
-                <div className="section mb-3">
-                  <VideoList id={item.id} />
+                <div className="section mb-3" ref={trailerSection}>
+                  <VideoList id={item.id} idNew={item.movie_id_fake} />
                 </div>
                 <div className="section mb-3">
                   <div className="mb-4 text-lg">Comments</div>
-                  <Comments comments={listComments} movieID={item.id} />
+                  <Comments
+                    comments={listComments}
+                    updateComments={setListComments}
+                    movieID={item.id}
+                  />
                 </div>
               </div>
               <div className="w-1/5  flex__content__column">
@@ -177,6 +213,7 @@ const Detail = () => {
                     isVertical={true}
                     type="similar"
                     id={item.id}
+                    idNew={item.movie_id_fake}
                   />
                 </div>
               </div>

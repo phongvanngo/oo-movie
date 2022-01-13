@@ -3,22 +3,17 @@ import Modal, { ModalWithButton } from 'components/modal/Modal';
 import PageHeader from 'components/page-header/PageHeader';
 import { DiscountInitialValue, IDiscount } from 'interfaces/Discount';
 import { FixMeLater } from 'interfaces/Migrate';
-import {
-  checkDiscountCode,
-  createOrder,
-  SaveCheckoutData,
-  UseDiscountCode,
-} from 'module/checkout/checkout';
+import { checkDiscountCode, createOrder } from 'module/checkout/checkout';
 import React, { ReactElement, useEffect, useState } from 'react';
 import { ReactCreditCardProps } from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useHistory } from 'react-router';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { useAppDispatch } from 'redux/hooks';
 import { setLoading } from 'redux/reducer/loader';
-import { selectorUserHistory } from 'redux/reducer/userHistory';
 import './checkout.scss';
 import PaymentCard from './PaymentCard';
+import { ImCancelCircle } from 'react-icons/im';
 
 interface Props {
   //   location: RouteComponentProps;
@@ -50,27 +45,28 @@ export default function Checkout({}: Props): ReactElement {
   const [promotionInput, setPromotionInput] = useState('');
   const [isValidCode, setIsValidCode] = useState(true);
 
-  const userHistory = useAppSelector(selectorUserHistory);
   const dispatch = useAppDispatch();
 
   const form = useForm<Inputs>();
 
+  const modal = {
+    success: 'PaymentNotification',
+    failure: 'ErrorInformation',
+  };
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     dispatch(setLoading(true));
 
-    createOrder(itemPurchasing, promotionState).then((data) => {
-      SaveCheckoutData(
-        userHistory,
-        itemPurchasing,
-        promotionState,
-        total,
-        dispatch
-      );
-
-      setModalVisible();
-
-      dispatch(setLoading(false));
-    });
+    createOrder(itemPurchasing, promotionState)
+      .then((data) => {
+        setModalVisible(modal.success);
+      })
+      .catch((error) => {
+        setModalVisible(modal.failure);
+      })
+      .finally(() => {
+        dispatch(setLoading(false));
+      });
   };
 
   //   ======== Component did mout ==============
@@ -86,8 +82,8 @@ export default function Checkout({}: Props): ReactElement {
   }, []);
   // +========== End use effect here ==========
 
-  const setModalVisible = () => {
-    const modal = document.querySelector(`#PaymentNotification`);
+  const setModalVisible = (value: String) => {
+    const modal = document.querySelector(`#${value}`);
     if (modal) {
       modal.classList.toggle('active');
     }
@@ -221,6 +217,29 @@ export default function Checkout({}: Props): ReactElement {
         >
           <div className="flex justify-center items-center text-xl text-center">
             <div>Purchase successfully! Get your pop corn now!</div>
+          </div>
+        </ModalWithButton>
+      </Modal>
+      {/* @ts-ignore */}
+      <Modal active={false} id="ErrorInformation">
+        {/* @ts-ignore */}
+        <ModalWithButton
+          onOk={() => history.push('/profile')}
+          okContent="View profile"
+        >
+          <div className="flex justify-center items-center text-xl text-center">
+            <div>
+              <span>
+                <ImCancelCircle
+                  style={{
+                    display: 'inline-block',
+                    color: 'red',
+                    marginRight: '10px',
+                  }}
+                />
+              </span>
+              <span>Purchase failed! You have already subscribed a plan.</span>
+            </div>
           </div>
         </ModalWithButton>
       </Modal>

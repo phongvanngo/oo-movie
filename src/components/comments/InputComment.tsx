@@ -2,6 +2,8 @@ import SubmitButton from 'components/submitButton/SubmitButton';
 import { FixMeLater } from 'interfaces/Migrate';
 import React, { ReactElement, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from 'redux/hooks';
+import { selectorUser } from 'redux/reducer/authenticateSlice';
 
 interface Props {
   handleComment: FixMeLater;
@@ -21,6 +23,7 @@ export default function InputComment({
       setTextValue(e.target.value);
     }
   };
+  const userAuth = useAppSelector(selectorUser);
 
   return (
     <div className="text-sm ">
@@ -35,10 +38,17 @@ export default function InputComment({
         ></textarea>
       </div>
       <div className="flex justify-end items-center">
-        <div className="mr-4 text-xs">
-          You are login as <span className="underline">NguyenKiet</span> .
-          <Link to="/"> Click to change</Link>
-        </div>
+        {userAuth && (
+          <div className="mr-4 text-xs">
+            You are login as <Link to="/profile">{userAuth?.displayName}</Link>
+          </div>
+        )}
+
+        {!userAuth && (
+          <div className="mr-4 text-xs">
+            <Link to="/sign-in">Sign-in</Link> to leave comments
+          </div>
+        )}
         <SubmitButton content="Post" onClick={handleComment} />
       </div>
     </div>

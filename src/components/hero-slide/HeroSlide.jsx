@@ -11,25 +11,33 @@ import apiConfig from '../../api/apiConfig';
 
 import './hero-slide.scss';
 import { useHistory } from 'react-router';
+import movieApi from 'api/oomovie/movieApi';
+import { useAppDispatch } from 'redux/hooks';
+import { setLoading } from 'redux/reducer/loader';
+import { filterMoviesByTrue } from 'utils/Movie';
 
 const HeroSlide = () => {
   SwiperCore.use([Autoplay]);
 
   const [movieItems, setMovieItems] = useState([]);
 
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     const getMovies = async () => {
-      const params = { page: 1 };
       try {
-        const response = await tmdbApi.getMoviesList(movieType.popular, {
-          params,
-        });
-        setMovieItems(response.results.slice(1, 4));
+        const response = await movieApi.getAll({});
+
+        const filterdMovies = filterMoviesByTrue(response.data);
+        setMovieItems(filterdMovies.slice(1, 5));
       } catch {
         console.log('error');
       }
     };
-    getMovies();
+    dispatch(setLoading(true));
+    getMovies().finally(() => {
+      dispatch(setLoading(false));
+    });
   }, []);
 
   return (
@@ -71,7 +79,9 @@ const HeroSlideItem = (props) => {
   const setModalActive = async () => {
     const modal = document.querySelector(`#modal_${item.id}`);
 
-    const videos = await tmdbApi.getVideos(category.movie, item.id);
+    const movieOrTv = item?.is_tv_series ? category.tv : category.movie;
+
+    const videos = await tmdbApi.getVideos(movieOrTv, item.movie_id_fake);
 
     if (videos.results.length > 0) {
       const videSrc = 'https://www.youtube.com/embed/' + videos.results[0].key;
@@ -95,7 +105,15 @@ const HeroSlideItem = (props) => {
           <h2 className="title">{item.title}</h2>
           <div className="overview">{item.overview}</div>
           <div className="btns">
-            <Button onClick={() => hisrory.push('/movie/' + item.id)}>
+            <Button
+              onClick={() => {
+                if (!item.is_tv_series) {
+                  hisrory.push('/movie/' + item.id);
+                } else {
+                  hisrory.push('/tv/' + item.id);
+                }
+              }}
+            >
               Watch now
             </Button>
             <OutlineButton onClick={setModalActive}>

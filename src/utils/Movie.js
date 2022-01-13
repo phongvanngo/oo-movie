@@ -26,3 +26,11 @@ export const searchMovies = (originalList, keyword) => {
     return title.indexOf(lowerKeyword) >= 0;
   });
 };
+
+export const filterMoviesByTrue = (listMovies) => {
+  if (listMovies) {
+    return listMovies.filter((movie) => movie.enabled === true);
+  } else {
+    return [];
+  }
+};

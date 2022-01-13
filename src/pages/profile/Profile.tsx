@@ -1,12 +1,10 @@
 import InContentButton from 'components/InContentButton/InContentButton';
-import ProfileLayout from 'layout/profile/ProfileLayout';
-import React, { ReactElement, useEffect, useState } from 'react';
+import Modal, { ModalWithButton } from 'components/modal/Modal';
+import { auth } from 'config/firebase';
+import { FixMeLater } from 'interfaces/Migrate';
+import React, { ReactElement, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { selectorUser, setCurrentUser } from 'redux/reducer/authenticateSlice';
-import { selectorUserHistory } from 'redux/reducer/userHistory';
-import { auth } from 'config/firebase';
-import Modal, { ModalWithButton } from 'components/modal/Modal';
-import { FixMeLater } from 'interfaces/Migrate';
 
 interface Props {}
 

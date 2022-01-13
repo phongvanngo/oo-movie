@@ -67,7 +67,6 @@ export const UseDiscountCode = async (id) => {
 };
 
 export const createOrder = async (purchasingItems, discount) => {
-  console.log(discount.code === true);
   let data = {
     movie_ids: [],
     plan_id: null,
@@ -92,6 +91,6 @@ export const createOrder = async (purchasingItems, discount) => {
     UseDiscountCode(discount?.id);
     return Promise.resolve(response);
   } catch (error) {
-    console.log(error);
+    return Promise.reject(error);
   }
 };

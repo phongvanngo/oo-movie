@@ -20,7 +20,7 @@ const PlanCard = ({ onCheckout, plan }: Props) => {
         </div>
         <div className="h-72">
           <div className="flex justify-between text-sm mb-1 pb-1">
-            <div>{plan.title}</div>
+            <div>{plan?.description}</div>
             <div className="text-2xl text-green-400">
               {' '}
               <AiFillLike />

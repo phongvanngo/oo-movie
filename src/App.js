@@ -14,6 +14,9 @@ import Header from './components/header/Header';
 import { auth } from './config/firebase';
 import routes from './config/routes';
 import LoadingOverlay from 'react-loading-overlay-ts';
+import MessengerCustomerChat from 'react-messenger-customer-chat';
+import { Slide, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const loading = useAppSelector(selectorLoader);
@@ -33,7 +36,7 @@ function App() {
       } else {
         console.log('No user detected');
       }
-      dispatch(setLoading(false));
+      //   dispatch(setLoading(false));
     });
   }, []);
 
@@ -72,7 +75,25 @@ function App() {
           })}
           ;
         </Switch>
+        <MessengerCustomerChat
+          pageId="112104784691331"
+          appId="256677786440177"
+          //   themeColor=""
+        />
+
         <Footer />
+        <ToastContainer
+          position="bottom-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          transition={Slide}
+        />
       </LoadingOverlay>
     </Router>
   );

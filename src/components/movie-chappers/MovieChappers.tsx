@@ -43,7 +43,7 @@ export default function MovieChappers({
                 key={index}
                 isActive={chappter.id === selectedChappter?.id}
               >
-                {chappter.ordinal}
+                {index + 1}
               </Chappter>
             );
           })}
